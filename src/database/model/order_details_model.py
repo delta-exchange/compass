@@ -1,0 +1,47 @@
+from sqlalchemy import (
+    Column, Integer, BigInteger, String, DateTime, DECIMAL, JSON, ForeignKey
+)
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+class OrderDetailsModel(Base):
+    __tablename__ = 'orders'
+
+    id = Column(BigInteger, primary_key=True, nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    product_id = Column(BigInteger, ForeignKey('products.id'), nullable=False)
+    order_type = Column(Integer, nullable=False)
+    stop_order_type = Column(Integer, nullable=True)
+    side = Column(Integer, nullable=False)
+    state = Column(Integer, nullable=False)
+    unfilled_size = Column(DECIMAL(36, 18), nullable=True)
+    size = Column(DECIMAL(36, 18), nullable=True)
+    limit_price = Column(DECIMAL(36, 18), nullable=True)
+    created_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
+    stop_price = Column(DECIMAL(36, 18), nullable=True)
+    commission = Column(DECIMAL(36, 18), nullable=False, default=0.0)
+    close_on_trigger = Column(Integer, nullable=True)
+    trail_amount = Column(DECIMAL(36, 18), nullable=True)
+    trigger_price_max_or_min = Column(DECIMAL(36, 18), nullable=True)
+    time_in_force = Column(Integer, nullable=True)
+    avg_fill_price = Column(DECIMAL(36, 18), nullable=True)
+    bracket_stop_loss_price = Column(DECIMAL(36, 18), nullable=True)
+    bracket_take_profit_price = Column(DECIMAL(36, 18), nullable=True)
+    bracket_trail_amount = Column(DECIMAL(36, 18), nullable=True)
+    client_order_id = Column(String(255), nullable=True)
+    cancellation_reason = Column(String(255), nullable=True)
+    meta_data = Column(JSON, nullable=True)
+    uuid = Column(String(255), nullable=True)
+    paid_commission = Column(DECIMAL(36, 18), nullable=True, default=0.0)
+    bracket_order = Column(Integer, nullable=True)
+    bracket_stop_loss_limit_price = Column(DECIMAL(36, 18), nullable=True)
+    bracket_take_profit_limit_price = Column(DECIMAL(36, 18), nullable=True)
+    stop_trigger_method = Column(Integer, nullable=True)
+    product_symbol = Column(String(255), nullable=True)
+    underlying_asset_id = Column(Integer, nullable=True)
+    quoting_asset_id = Column(Integer, nullable=True)
+    quote_size = Column(DECIMAL(36, 18), nullable=True)
+    mmp = Column(Integer, nullable=True) 
+    contract_type = Column(Integer, nullable=True)
