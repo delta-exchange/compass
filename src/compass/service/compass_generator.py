@@ -9,6 +9,7 @@ from .customer_details_service import CustomerDetailsService
 from.exchange_trades_service import ExchangeTradesService
 from .customer_last_transaction_details_service import CustomerLastTransactionDetailsService
 from .transaction_details_service import TransactionDetailsService
+from .product_details_service import ProductDetailsService
 
 class CompassGenerator:
 
@@ -25,3 +26,4 @@ class CompassGenerator:
         ExchangeTradesService.generate_trade_volume_details()
         CustomerLastTransactionDetailsService.generate_last_transaction_details()
         TransactionDetailsService.generate_transaction_details()
+        ProductDetailsService.generate_product_details()

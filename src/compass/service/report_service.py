@@ -14,7 +14,7 @@ class ReportService:
             return
         columns = list(content[0].keys())
         with open(report_path, "a", newline="") as file:
-            writer = csv.DictWriter(file, fieldnames=columns)
+            writer = csv.DictWriter(file, fieldnames=columns, delimiter='|')
             if file.tell() == 0:
                 writer.writeheader()
             writer.writerows(content) 

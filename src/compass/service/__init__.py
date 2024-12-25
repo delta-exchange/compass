@@ -7,3 +7,4 @@ from .exchange_trades_service import ExchangeTradesService
 from .customer_last_transaction_details_service import CustomerLastTransactionDetailsService
 from .transaction_details_service import TransactionDetailsService
 from .compass_generator import CompassGenerator
+from .product_details_service import ProductDetailsService
