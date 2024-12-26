@@ -5,3 +5,5 @@ psycopg2-binary==2.9.3
 python-dotenv==1.0.1
 requests==2.32.3
 SQLAlchemy==2.0.36
+paramiko==3.5.0
+scp==0.15.0

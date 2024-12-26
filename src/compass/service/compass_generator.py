@@ -10,7 +10,7 @@ from.exchange_trades_service import ExchangeTradesService
 from .customer_last_transaction_details_service import CustomerLastTransactionDetailsService
 from .transaction_details_service import TransactionDetailsService
 from .product_details_service import ProductDetailsService
-from src.vendor import SlackNotifier
+from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 
 class CompassGenerator:
@@ -29,8 +29,9 @@ class CompassGenerator:
             CustomerLastTransactionDetailsService.generate_last_transaction_details()
             TransactionDetailsService.generate_transaction_details()
             ProductDetailsService.generate_product_details()
+            SCPTransfer.push_files_to_remote(reports_directory)
             SlackNotifier.send_alert('Compass cron\n```status: Success\n```')
         except Exception as exception:
             exception_message = traceback.format_exc()
-            logger.error(f'An error occurred while generating reports: {exception}')
+            logger.error(f'An error occurred while generating reports: {exception_message}')
             SlackNotifier.send_alert(f'Compass cron\n```status: Failure\nReason: {exception_message}```')
