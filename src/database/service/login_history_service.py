@@ -12,7 +12,7 @@ class LoginHistoryService:
         return login_histories
     
     @staticmethod
-    def get_users_by_created_at(created_at = DateTimeUtil.get_24hrs_ago()):
+    def get_users_by_created_at(created_at = DateTimeUtil.get_1yr_ago()):
         session = IamEngine.get_session()
         users = session.query(LoginHistoryModel.user_id).filter(LoginHistoryModel.created_at > created_at).distinct().all()
         return users

@@ -18,18 +18,15 @@ class CompassGenerator:
     @staticmethod
     def start():
         try:
-            reports_directory = os.path.join(os.getcwd(), 'reports', DateTimeUtil.get_current_date())
+            reports_directory = os.path.join(os.getcwd(), 'reports', 'master')
             logger.info(f'cleaning up reports for directory : {reports_directory}')
             if os.path.exists(reports_directory): shutil.rmtree(reports_directory)
             LinkedAccountDetailsService.generate_linked_account_details()
-            CustomerLoginDetailsService.generate_customer_login_details()
             ExchangeDetailsService.generate_exchange_details()
             CustomerDetailsService.generate_customer_details_details()
-            ExchangeTradesService.generate_trade_volume_details()
-            CustomerLastTransactionDetailsService.generate_last_transaction_details()
-            TransactionDetailsService.generate_transaction_details()
             ProductDetailsService.generate_product_details()
-            SCPTransfer.push_files_to_remote(reports_directory)
+            TransactionDetailsService.generate_transaction_details()
+            # SCPTransfer.push_files_to_remote(reports_directory)
             SlackNotifier.send_alert('Compass cron\n```status: Success\n```')
         except Exception as exception:
             exception_message = traceback.format_exc()

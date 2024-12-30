@@ -9,6 +9,12 @@ class DateTimeUtil:
         return updated_since
     
     @staticmethod
+    def get_1yr_ago():
+        utc_1yr_ago = datetime.now(timezone.utc) - timedelta(days=365)
+        updated_since = utc_1yr_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
+        return updated_since
+    
+    @staticmethod
     def get_date_from_string(date_string):
         return datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
     

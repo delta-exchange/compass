@@ -1,4 +1,4 @@
-from src.database.service import OrderDetailsService, LoginHistoryService, UserDetailsService, UserBankAccountService, FillsService
+from src.database.service import OrderDetailsService, LoginHistoryService, UserDetailsService, UserBankAccountService, FillsService, ProductService
 from .report_service import ReportService
 from src.util import logger, DateTimeUtil
 
@@ -10,11 +10,10 @@ class TransactionDetailsService:
 
     @staticmethod
     def generate_transaction_details():
-        products = TransactionDetailsService.__get_products()
         try:
             users = LoginHistoryService.get_users_by_created_at()
             user_ids =  list(map(lambda user: user[0], users))
-            batch, batch_size, transactions_count = 1, 100, 0
+            batch, batch_size, transactions_count = 1, 500, 0
             while True:
                 logger.info(f'generating transaction details for batch {batch}')
                 user_ids_batch = user_ids[(batch - 1) * batch_size : batch * batch_size]
@@ -27,7 +26,8 @@ class TransactionDetailsService:
                 order_fills = FillsService.get_by_order_ids(order_ids)
                 counter_party_users = list(map(lambda order_fill: order_fill.counter_party_user_id, order_fills))
                 users = UserDetailsService.get_by_user_ids(user_ids_batch + counter_party_users)
-                
+                product_symbols = [transaction.product_symbol for transaction in transactions]
+                products = ProductService.get_by_product_symbols(product_symbols)
                 
                 transactions_compass = TransactionDetailsService.__convert_to_compass_format(transactions, users, user_banks, order_fills, products)
                 ReportService.write_report('Transaction', transactions_compass)
@@ -68,8 +68,8 @@ class TransactionDetailsService:
                 'TRANSACTIONTYPE': transaction.order_type,
                 'TRANSACTIONDATETIME': transaction.created_at,
                 'FUTURE_OPTIONS_FLAG': True,
-                'CALLORPUTTYPE': product.get('contract_type'),
-                'STRIKEPRICE': product.get('strike_price'),
+                'CALLORPUTTYPE': product.contract_type,
+                'STRIKEPRICE': product.strike_price,
                 'EXPIRYDATE': None,
                 'TRANSACTIONINDICATOR': None,
                 'CUSTOMERID': user_id,
@@ -116,11 +116,3 @@ class TransactionDetailsService:
             })
         
         return transactions_compass
-    
-    @staticmethod
-    def __get_products():
-        api_base_url = os.getenv('DELTA_EXCHANGE_API_BASE_URL')
-        products_response = requests.get(url = f'{api_base_url}/v2/products', headers={'accept': 'application/json'})
-        products = products_response.json().get('result')
-        products = dict(map(lambda product: (product['symbol'], product), products))
-        return products
