@@ -5,7 +5,7 @@ from src.database.model import UserBankAccountModel
 class UserBankAccountService:
     
     @staticmethod
-    def get_batch_by_created_at(batch, limit = 100, created_at = DateTimeUtil.get_24hrs_ago()):
+    def get_batch_by_created_at(batch, limit = 500, created_at = DateTimeUtil.get_24hrs_ago()):
         offset = (batch -1) * limit
         session = WalletEngine.get_session()
         user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.created_at > created_at).order_by(UserBankAccountModel.created_at).limit(limit).offset(offset).all()

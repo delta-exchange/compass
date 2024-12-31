@@ -11,7 +11,7 @@ class CustomerLastTransactionDetailsService:
         try:
             users = LoginHistoryService.get_users_by_created_at()
             user_ids =  list(map(lambda user: user[0], users))
-            batch, batch_size, last_transactions_count = 1, 100, 0
+            batch, batch_size, last_transactions_count = 1, 500, 0
             while True:
                 logger.info(f'generating customer last transaction details for batch {batch}')
                 user_ids_batch = user_ids[(batch - 1) * batch_size : batch * batch_size]

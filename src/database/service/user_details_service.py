@@ -5,7 +5,7 @@ from src.database.model import UserDetailsModel
 class UserDetailsService:
     
     @staticmethod
-    def get_batch_by_created_at(batch, limit = 100, created_at = DateTimeUtil.get_24hrs_ago()):
+    def get_batch_by_created_at(batch, limit = 500, created_at = DateTimeUtil.get_24hrs_ago()):
         offset = (batch -1) * limit
         session = IamEngine.get_session()
         users = session.query(UserDetailsModel).filter(UserDetailsModel.created_at > created_at).order_by(UserDetailsModel.created_at).limit(limit).offset(offset).all()
