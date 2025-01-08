@@ -16,7 +16,7 @@ class ProductDetailsService:
             products += products_batch
             batch += 1   
         products_compass = ProductDetailsService.__convert_to_compass_format(products)
-        ReportService.write_report('PrdouctCode Details', products_compass)
+        ReportService.write_report('ProductCode Details', products_compass)
         products_count = len(products_compass)
         logger.info(f'generated product details for {products_count}')
 

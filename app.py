@@ -5,7 +5,7 @@ from apscheduler.triggers.cron import CronTrigger
 from src.compass.service import CompassGenerator
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(CompassGenerator.start, CronTrigger(minute='*/5'))
+scheduler.add_job(CompassGenerator.start, CronTrigger(hour=4,minute=30))
 scheduler.start()
 
 app = Flask(__name__)

@@ -34,7 +34,6 @@ class LinkedAccountDetailsService:
             'LinkedBankIFSCCode': user_bank_account.ifsc_code,
             'LinkedBranchMICRNo': None,
             'LinkedAccountOpenedDate': None,
-            'LinkedAccountOpenedDate': None,
             'LinkedProductCode': None,
             'LinkedProductType': None,
             'LinkedAccountCurrency': None,

@@ -13,6 +13,7 @@ from .product_details_service import ProductDetailsService
 from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 import tarfile
+import json
 
 class CompassGenerator:
 
@@ -22,6 +23,7 @@ class CompassGenerator:
             reports_directory = os.path.join(os.getcwd(), 'reports', DateTimeUtil.get_current_date())
             logger.info(f'cleaning up reports for directory : {reports_directory}')
             if os.path.exists(reports_directory): shutil.rmtree(reports_directory)
+            os.makedirs(reports_directory)
             LinkedAccountDetailsService.generate_linked_account_details()
             CustomerLoginDetailsService.generate_customer_login_details()
             ExchangeDetailsService.generate_exchange_details()
@@ -30,6 +32,7 @@ class CompassGenerator:
             CustomerLastTransactionDetailsService.generate_last_transaction_details()
             TransactionDetailsService.generate_transaction_details()
             ProductDetailsService.generate_product_details()
+            CompassGenerator.add_blank_reports_for_missing_data(reports_directory)
             CompassGenerator.compress_and_send_reports(reports_directory)
             SlackNotifier.send_alert('Compass cron\n```status: Success\n```')
         except Exception as exception:
@@ -37,6 +40,16 @@ class CompassGenerator:
             logger.error(f'An error occurred while generating reports: {exception_message}')
             SlackNotifier.send_alert(f'Compass cron\n```status: Failure\nReason: {exception_message}```')
 
+    @staticmethod
+    def add_blank_reports_for_missing_data(reports_directory):
+        attributes_template_path = "src/compass/template/attributes.json"
+        file_content = open(attributes_template_path, 'r') 
+        attributes = json.load(file_content)
+        for service in attributes:
+            file = open(os.path.join(reports_directory, f'{service}.csv'), 'w')
+            file.write(','.join(attributes[service]))
+            file.close()
+        
     @staticmethod
     def compress_and_send_reports(reports_directory):
         tar_file_name = f'compressed_{DateTimeUtil.get_current_date()}.tar.gz'
