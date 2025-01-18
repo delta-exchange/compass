@@ -1,5 +1,5 @@
 {
-    "Customer Details": [
+    "CST": [
         "Customer ID",
         "Constitution Type",
         "Customer Type",
@@ -151,7 +151,7 @@
         "CUSTOMERONBOARDING_GEOLOCATION",
         "CUSTOMER_FAMILYCODE/CUSTOMER_GROUPCODE"
     ],
-    "CustomerLastTransactionDetails": [
+    "CTD": [
         "CUSTOMERID",
         "EXCHANGECODE",
         "FIRSTTRADEDATE",
@@ -159,7 +159,7 @@
         "CUSTOMEREXCSTAT",
         "CUSTOMEREXCSTATREASON"
     ],
-    "CustomerLoginLogDetails": [
+    "CLD": [
         "Customer ID",
         "CUSTOMERLOGIN_DATETIME",
         "CUSTOMERLOGIN_IPADDRESS",
@@ -170,13 +170,13 @@
         "CUSTOMERLOGIN_COUNTRY",
         "CUSTOMERLOGIN_GEOLOCATION"
     ],
-    "ExchangeDetails": [
+    "EXD": [
         "EXCHANGECODE",
         "MARKETTYPE",
         "MARKETNAME",
         "DESCRIPTION"
     ],
-    "ExchangeTradeVolumeDetails": [
+    "ETD": [
         "EXCHANGECODE",
         "SCRIPTCODE",
         "ORG_SCRIPTCODE",
@@ -196,7 +196,7 @@
         "DAILYVALUE",
         "STRIKEPRICE"
     ],
-    "LinkedAccountDetails": [
+    "LAD": [
         "CustomerId",
         "LinkedAccountNo",
         "LinkedBankCode",
@@ -211,12 +211,12 @@
         "LinkedAccountStatus",
         "AccountLinkedDateTime"
     ],
-    "ProductCode Details": [
+    "PRD": [
         "SCRIPCODE",
         "SCRIPNAME",
         "ISSUEDCAPITAL"
     ],
-    "Transaction": [
+    "TRN": [
         "TransactionBatchId",
         "TransactionId",
         "EXCHANGECODE",

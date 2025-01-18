@@ -8,6 +8,7 @@ class CustomerLastTransactionDetailsService:
 
     @staticmethod
     def generate_last_transaction_details():
+        report_name = f"CTD{DateTimeUtil.get_current_date()}01"
         try:
             users = LoginHistoryService.get_users_by_created_at()
             user_ids =  list(map(lambda user: user[0], users))
@@ -25,7 +26,7 @@ class CustomerLastTransactionDetailsService:
                 users = UserDetailsService.get_by_user_ids(user_ids_batch)
                 
                 transactions_compass = CustomerLastTransactionDetailsService.__convert_to_compass_format(transactions, users)
-                ReportService.write_report('CustomerLastTransactionDetails', transactions_compass)
+                ReportService.write_report(report_name, transactions_compass)
 
                 last_transactions_count += len(transactions_compass)
                 batch += 1

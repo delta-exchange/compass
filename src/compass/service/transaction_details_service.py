@@ -8,6 +8,7 @@ class TransactionDetailsService:
 
     @staticmethod
     def generate_transaction_details():
+        report_name = f"TRN{DateTimeUtil.get_current_date()}01"
         try:
             users = LoginHistoryService.get_users_by_created_at()
             user_ids =  list(map(lambda user: user[0], users))
@@ -33,7 +34,7 @@ class TransactionDetailsService:
                 products = ProductService.get_by_product_symbols(product_symbols)
                 
                 transactions_compass = TransactionDetailsService.__convert_to_compass_format(transactions, users, user_banks, order_fills, products)
-                ReportService.write_report('Transaction', transactions_compass)
+                ReportService.write_report(report_name, transactions_compass)
 
                 transactions_count += len(transactions_compass)
                 batch += 1

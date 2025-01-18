@@ -22,4 +22,4 @@ class DateTimeUtil:
     
     @staticmethod
     def get_current_date():
-        return datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        return datetime.now(timezone.utc).strftime('%d%m%Y')

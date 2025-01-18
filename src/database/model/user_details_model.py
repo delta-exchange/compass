@@ -27,8 +27,6 @@ class UserDetailsModel(Base):
     phishing_code = Column(String(255))
     nick_name = Column(String(255))
     is_kyc_done = Column(Boolean, default=False)
-    kyc_status = Column(Enum('pending', 'initiated', 'in_review', 'waiting_for_approval', 
-                             'recapture_pending', 'approved', 'rejected'), default='pending', nullable=False)
     kyc_document_number = Column(String(255))
     password_updated_at = Column(DateTime)
     mfa_updated_at = Column(DateTime)

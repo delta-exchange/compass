@@ -8,6 +8,7 @@ class CustomerDetailsService:
 
     @staticmethod
     def generate_customer_details_details():
+        report_name = f"CST{DateTimeUtil.get_current_date()}01"
         try:
             batch, login_histories_count = 1, 0
             while True:
@@ -15,7 +16,7 @@ class CustomerDetailsService:
                 users = UserDetailsService.get_batch_by_created_at(batch)
                 if len(users) == 0:
                     break
-                ReportService.write_report('Customer Details', CustomerDetailsService.__convert_to_compass_format(users))
+                ReportService.write_report(report_name, CustomerDetailsService.__convert_to_compass_format(users))
                 batch += 1
                 login_histories_count += len(users)
             logger.info(f'generated customer details for {login_histories_count} login histories')

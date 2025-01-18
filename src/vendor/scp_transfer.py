@@ -5,8 +5,8 @@ from src.util import logger
 
 class SCPTransfer:
     @staticmethod
-    def push_file_to_remote(local_file_path):
-        logger.info(f"Pushing {local_file_path} to remote compass server")
+    def push_files_to_remote_server_by_directory(directory):
+        logger.info(f"Pushing files to remote compass server from {directory}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -16,7 +16,9 @@ class SCPTransfer:
         ssh.connect(remote_host, username=username, password=password)
 
         scp = SCPClient(ssh.get_transport())
-        scp.put(local_file_path, os.getenv("COMPASS_REPORTS_DIRECTORY"))
+        for file in os.listdir(directory):
+            logger.info(f"Pushing file {file} to remote compass server")
+            scp.put(os.path.join(directory, file), os.getenv("COMPASS_REPORTS_DIRECTORY"))
         scp.close()
         ssh.close()
-        logger.info("File pushed to remote compass server")
+        logger.info("Files pushed to remote compass server")

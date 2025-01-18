@@ -1,5 +1,5 @@
 from .report_service import ReportService
-from src.util import logger
+from src.util import logger, DateTimeUtil
 import os
 import requests
 
@@ -9,10 +9,11 @@ class ExchangeTradesService:
 
     @staticmethod
     def generate_trade_volume_details():
+        report_name = f"ETD{DateTimeUtil.get_current_date()}01"
         logger.info(f'generating exchange trade volume details')
         tickers = ExchangeTradesService.__get_tickers()
         tickers_compass = ExchangeTradesService.__convert_to_compass_format(tickers)
-        ReportService.write_report('ExchangeTradeVolumeDetails', tickers_compass)
+        ReportService.write_report(report_name, tickers_compass)
         logger.info(f'generated exchange trade volume details')
 
     @staticmethod

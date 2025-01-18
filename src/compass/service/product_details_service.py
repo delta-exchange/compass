@@ -1,11 +1,12 @@
 from src.database.service import ProductService
 from .report_service import ReportService
-from src.util import logger
+from src.util import logger, DateTimeUtil
 
 class ProductDetailsService:
 
     @staticmethod
     def generate_product_details():
+        report_name = f"PRD{DateTimeUtil.get_current_date()}01"
         products = []
         batch = 1
         while(True):
@@ -16,7 +17,7 @@ class ProductDetailsService:
             products += products_batch
             batch += 1   
         products_compass = ProductDetailsService.__convert_to_compass_format(products)
-        ReportService.write_report('ProductCode Details', products_compass)
+        ReportService.write_report(report_name, products_compass)
         products_count = len(products_compass)
         logger.info(f'generated product details for {products_count}')
 

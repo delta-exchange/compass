@@ -1,6 +1,6 @@
 from src.database.service import LoginHistoryService
 from .report_service import ReportService
-from src.util import logger
+from src.util import logger, DateTimeUtil
 
 import traceback
 
@@ -8,6 +8,7 @@ class CustomerLoginDetailsService:
 
     @staticmethod
     def generate_customer_login_details():
+        report_name = f"CLD{DateTimeUtil.get_current_date()}01"
         try:
             batch, login_histories_count = 1, 0
             while True:
@@ -15,7 +16,7 @@ class CustomerLoginDetailsService:
                 login_histories = LoginHistoryService.get_batch_by_created_at(batch)
                 if len(login_histories) == 0:
                     break
-                ReportService.write_report('CustomerLoginLogDetails', CustomerLoginDetailsService.__convert_to_compass_format(login_histories))
+                ReportService.write_report(report_name, CustomerLoginDetailsService.__convert_to_compass_format(login_histories))
                 batch += 1
                 login_histories_count += len(login_histories)
             logger.info(f'generated customer login details for {login_histories_count} login histories')
