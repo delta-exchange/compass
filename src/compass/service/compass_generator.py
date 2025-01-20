@@ -46,6 +46,8 @@ class CompassGenerator:
         file_content = open(attributes_template_path, 'r') 
         attributes = json.load(file_content)
         for service in attributes:
-            file = open(os.path.join(reports_directory, f'{service}{DateTimeUtil.get_current_date()}01.csv'), 'w')
-            file.write(','.join(attributes[service]))
-            file.close()
+            report_path = os.path.join(reports_directory, f'{service}{DateTimeUtil.get_current_date()}01.csv')
+            if not os.path.exists(report_path):
+                file = open(report_path, 'w')
+                file.write(','.join(attributes[service]))
+                file.close()
