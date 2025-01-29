@@ -51,3 +51,7 @@ class CompassGenerator:
                 file = open(report_path, 'w')
                 file.write(','.join(attributes[service]))
                 file.close()
+        eod_file_path = os.path.join(reports_directory, f"EOD{DateTimeUtil.get_current_date()}.csv")
+        if not os.path.exists(eod_file_path):
+            file = open(eod_file_path, 'w')
+            file.close()

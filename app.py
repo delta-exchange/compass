@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 if __name__ == "__main__":
     try: 
-        load_dotenv(find_dotenv(), override=False)
+        load_dotenv(find_dotenv(), override=True)
         app.run(debug=True)
     except (KeyboardInterrupt, SystemExit):
         scheduler.shutdown()
