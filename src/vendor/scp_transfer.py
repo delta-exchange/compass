@@ -19,7 +19,10 @@ class SCPTransfer:
         for file in os.listdir(directory):
             logger.info(f"Pushing file {file} to remote compass server")
             scp.put(os.path.join(directory, file), os.getenv("COMPASS_REPORTS_DIRECTORY"))
+        scp.close()
+
         logger.info(f"Pushing EOD file {eod_file_path} to remote compass server")
+        scp = SCPClient(ssh.get_transport())
         scp.put(os.path.join(directory, eod_file_path), os.getenv("COMPASS_REPORTS_DIRECTORY"))
         scp.close()
         ssh.close()
