@@ -4,3 +4,4 @@ from .user_details_service import UserDetailsService
 from .order_details_service import OrderDetailsService
 from .fills_service import FillsService
 from .product_service import ProductService
+from .kyc_details_service import KycDocumentsService

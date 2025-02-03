@@ -1,4 +1,4 @@
-from src.database.service import UserDetailsService
+from src.database.service import UserDetailsService, KycDocumentsService
 from .report_service import ReportService
 from src.util import logger, DateTimeUtil
 
@@ -16,7 +16,8 @@ class CustomerDetailsService:
                 users = UserDetailsService.get_batch_by_created_at(batch)
                 if len(users) == 0:
                     break
-                ReportService.write_report(report_name, CustomerDetailsService.__convert_to_compass_format(users))
+                user_kyc_details = KycDocumentsService.get_by_user_ids([user.id for user in users])
+                ReportService.write_report(report_name, CustomerDetailsService.__convert_to_compass_format(users, user_kyc_details))
                 batch += 1
                 login_histories_count += len(users)
             logger.info(f'generated customer details for {login_histories_count} login histories')
@@ -25,15 +26,16 @@ class CustomerDetailsService:
             traceback.print_exc()
 
     @staticmethod
-    def __convert_to_compass_format(users):
+    def __convert_to_compass_format(users, user_kyc_details):
         users_compass = []
         for user in users:
+            kyc = user_kyc_details.get(user.id, {})
             users_compass.append({
                 'Customer ID': user.id,
                 'Constitutiopn Type': None,
                 'Customer Type': None,
                 'PRIMARY_SEGMENT': None,
-                'Customer Name': f'{user.first_name} {user.last_name}',
+                'Customer Name': f"{user.first_name if user.first_name else ''} {user.last_name if user.last_name else ''}",
                 'FirstName': user.first_name,
                 'MiddleName': None,
                 'LastName': user.last_name,
@@ -51,11 +53,11 @@ class CustomerDetailsService:
                 'OccupationCode': user.occupation,
                 'Nature of Business': user.occupation,
                 'Credit Rating': None,
-                'PAN No': None,
+                'PAN No': kyc.get("pan_number"),
                 'Passport No': None,
                 'Driving License No': None,
                 'VoterIdentityCardNo': None,
-                'IdentityNo': None,
+                'IdentityNo': kyc.get("aadhaar_number"),
                 'TAX ID': None,
                 'Annual Income': user.income,
                 'Income From Business': None,
@@ -72,11 +74,11 @@ class CustomerDetailsService:
                 'RM Name': None,
                 'RM Mobile': None,
                 'Authorized  Capital': None,
-                'Phone Details': f'{user.country_calling_code} f{user.phone_number}',
+                'Phone Details': f"{user.country_calling_code if user.country_calling_code else ''} {user.phone_number if user.phone_number else ''}",
                 'PEP Flag': None,
                 'NPO Flag': None,
                 'HNI Flag': None,
-                'Communication Address Line1': None,
+                'Communication Address Line1': kyc.get("address"),
                 'Communication Address Line2': None,
                 'Communication City': None,
                 'Communication State': user.region,
@@ -88,7 +90,7 @@ class CustomerDetailsService:
                 'Communication Phone No': user.phone_number,
                 'Communication Fax No': None,
                 'Communication EmailId': user.email,
-                'PermanentAddress Line 1': None,
+                'PermanentAddress Line 1': kyc.get("address"),
                 'PermanentAddress Line 2': None,
                 'Permanent City': None,
                 'Permanent State': user.region,
@@ -172,7 +174,7 @@ class CustomerDetailsService:
                 'DATA_SOURCE': None,
                 'UPDATE_TIMESTAMP': user.updated_at,
                 'CUSTOMERONBOARDING_IPADDRESS': None,
-                'CUSTOMERONBOARDING_ADDRESS': None,
+                'CUSTOMERONBOARDING_ADDRESS': kyc.get("address"),
                 'CUSTOMERONBOARDING_CITY': None,
                 'CUSTOMERONBOARDING_PROVINCE_OR_STATE': user.region,
                 'CUSTOMERONBOARDING_PINCODE': None,
