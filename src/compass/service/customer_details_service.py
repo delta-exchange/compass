@@ -10,17 +10,20 @@ class CustomerDetailsService:
     def generate_customer_details_details():
         report_name = f"CST{DateTimeUtil.get_current_date()}01"
         try:
-            batch, login_histories_count = 1, 0
+            batch, users_count = 1, 0
             while True:
                 logger.info(f'generating customer details for batch {batch}')
                 users = UserDetailsService.get_batch_by_created_at(batch)
                 if len(users) == 0:
                     break
-                user_kyc_details = KycDocumentsService.get_by_user_ids([user.id for user in users])
+
+                user_ids = [user.id for user in users] + [user.parent_user_id for user in users]
+                valid_user_ids = [id for id in user_ids if id]
+                user_kyc_details = KycDocumentsService.get_by_user_ids(valid_user_ids)
                 ReportService.write_report(report_name, CustomerDetailsService.__convert_to_compass_format(users, user_kyc_details))
                 batch += 1
-                login_histories_count += len(users)
-            logger.info(f'generated customer details for {login_histories_count} login histories')
+                users_count += len(users)
+            logger.info(f'generated customer details for {users_count} login histories')
         except Exception as exception:
             logger.error(f'failed to generate customer details: {exception}')
             traceback.print_exc()
@@ -30,6 +33,9 @@ class CustomerDetailsService:
         users_compass = []
         for user in users:
             kyc = user_kyc_details.get(user.id, {})
+            if (not kyc) and user.parent_user_id:
+                kyc = user_kyc_details.get(user.parent_user_id, {})
+
             users_compass.append({
                 'Customer ID': user.id,
                 'Constitutiopn Type': None,

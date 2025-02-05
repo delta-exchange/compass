@@ -15,3 +15,15 @@ class Encrpytion:
             return decrypted_data.decode()
         except Exception as e:
             logger.error(f"error while decrypting kyc data: {e}")
+            return Encrpytion.decrypt_kyc_data_by_old_aes_key(vector, cipher)
+
+    @staticmethod
+    def decrypt_kyc_data_by_old_aes_key(vector, cipher):
+        try:
+            aes_key = os.getenv("OLD_AES_KEY")
+            key, iv, ciphertext = binascii.unhexlify(aes_key), binascii.unhexlify(vector),  binascii.unhexlify(cipher)
+            cipher = AES.new(key, AES.MODE_CBC, iv)
+            decrypted_data = unpad(cipher.decrypt(ciphertext), AES.block_size)
+            return decrypted_data.decode()
+        except Exception as e:
+            logger.error(f"error while decrypting kyc data using old aes key: {e}")
