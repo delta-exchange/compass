@@ -14,12 +14,8 @@ class FillsService:
 
     @staticmethod
     def get_by_order_ids_since(order_ids, since):
-        try: 
-            session = TimescaleEngine.get_session()
-            fills = session.query(FillsModel).filter(FillsModel.created_at > since, FillsModel.order_id.in_(order_ids)).all()
-            return fills
-        except Exception as exception:
-            logger.error(f'error occurred while fetching fills: {exception}')
-            traceback.print_exc()
-            return []
+        session = TimescaleEngine.get_session()
+        fills = session.query(FillsModel).filter(FillsModel.created_at > since, FillsModel.order_id.in_(order_ids)).all()
+        return fills
+
 
