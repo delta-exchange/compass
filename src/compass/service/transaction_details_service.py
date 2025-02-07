@@ -77,6 +77,9 @@ class TransactionDetailsService:
             counter_party_user_id = order_fill.counter_party_user_id if order_fill else None
             counter_party_user = users_mapping.get(counter_party_user_id) if counter_party_user_id else None
 
+            if order_fill:
+                logger.debug(f"Order ID: {order.id} Counter Party: {counter_party_user_id}")
+
             transactions_compass.append({
                 'TransactionBatchId': None,
                 'TransactionId': order.id,
