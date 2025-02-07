@@ -1,6 +1,7 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from src.util import logger
 
 
 class TimescaleEngine:
@@ -11,6 +12,8 @@ class TimescaleEngine:
         host = os.getenv('TIMESCALE_HOSTNAME')
         port = os.getenv('TIMESCALE_PORT')
         database = os.getenv('TIMESCALE_DB_NAME')
+        url = f'postgresql://{username}:{password}@{host}:{port}/{database}'
+        logger.debug(f"time_scale url: {url}")
         engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{database}')
         Session = sessionmaker(bind=engine)
         return Session()

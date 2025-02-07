@@ -17,6 +17,7 @@ class FillsService:
         logger.debug(f"getting fills for orders: {order_ids}")
         session = TimescaleEngine.get_session()
         fills = session.query(FillsModel).filter(FillsModel.created_at > since, FillsModel.order_id.in_(order_ids)).all()
+        logger.debug(f"fetched fills for orders: {len(fills)}")
         return fills
 
 
