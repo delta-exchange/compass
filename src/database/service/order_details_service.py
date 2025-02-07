@@ -9,7 +9,7 @@ class OrderDetailsService:
     def get_batch_since(batch, since, batch_size = 500):
         offset = (batch -1) * batch_size
         session = LedgerEngine.get_session()
-        orders = session.query(OrderDetailsModel).filter(OrderDetailsModel.created_at > since).order_by(OrderDetailsModel.created_at).limit(batch_size).offset(offset).all()
+        orders = session.query(OrderDetailsModel).filter(OrderDetailsModel.updated_at > since).order_by(OrderDetailsModel.updated_at).limit(batch_size).offset(offset).all()
         return orders
     
     @staticmethod

@@ -18,6 +18,7 @@ class TransactionDetailsService:
                 if len(orders) == 0: break
 
                 orders_fills_mapping = TransactionDetailsService.get_order_fills_mapping(orders, from_time)
+                logger.debugger(f"Order fills: {orders_fills_mapping}")
 
                 users_mapping = TransactionDetailsService.get_users_mapping(orders, orders_fills_mapping)
                 
@@ -76,9 +77,6 @@ class TransactionDetailsService:
             order_fill = orders_fills_mapping.get(order.id)
             counter_party_user_id = order_fill.counter_party_user_id if order_fill else None
             counter_party_user = users_mapping.get(counter_party_user_id) if counter_party_user_id else None
-
-            if order_fill:
-                logger.debug(f"Order ID: {order.id} Counter Party: {counter_party_user_id}")
 
             transactions_compass.append({
                 'TransactionBatchId': None,
