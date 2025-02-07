@@ -43,7 +43,7 @@ class TransactionDetailsService:
     def get_order_fills_mapping(orders, from_time):
         orders_fills_mapping = {}
         filled_orders = [order for order in orders if order.avg_fill_price]
-        logger.debug(f"Filled orders: {filled_orders}")
+        logger.debug(f"Filled orders: {{order.id for order in filled_orders}}")
         if len(filled_orders) > 0:
             order_ids = [str(order.id) for order in filled_orders]
             fills = FillsService.get_by_order_ids_since(order_ids, from_time)
