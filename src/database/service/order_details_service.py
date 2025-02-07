@@ -4,6 +4,13 @@ from sqlalchemy import func
 from src.util import DateTimeUtil
 
 class OrderDetailsService:
+
+    @staticmethod
+    def get_batch_since(batch, since, batch_size = 500):
+        offset = (batch -1) * batch_size
+        session = LedgerEngine.get_session()
+        orders = session.query(OrderDetailsModel).filter(OrderDetailsModel.created_at > since).order_by(OrderDetailsModel.created_at).limit(batch_size).offset(offset).all()
+        return orders
     
     @staticmethod
     def get_first_and_last_by_user_ids(user_ids):
@@ -16,7 +23,7 @@ class OrderDetailsService:
         return orders
     
     @staticmethod
-    def get_by_user_ids_and_created_at(user_ids, created_at = DateTimeUtil.get_24hrs_ago()):
+    def get_by_user_ids_and_created_at(user_ids, created_at):
         session = LedgerEngine.get_session()
         orders = session.query(OrderDetailsModel).filter(OrderDetailsModel.user_id.in_(user_ids), OrderDetailsModel.created_at > created_at).all()
         return orders

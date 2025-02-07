@@ -5,10 +5,10 @@ from src.database.model import UserBankAccountModel
 class UserBankAccountService:
     
     @staticmethod
-    def get_batch_by_created_at(batch, limit = 500, created_at = DateTimeUtil.get_24hrs_ago()):
-        offset = (batch -1) * limit
+    def get_batch_since(batch, since, batch_size = 500):
+        offset = (batch -1) * batch_size
         session = WalletEngine.get_session()
-        user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.created_at > created_at, UserBankAccountModel.is_active == True).order_by(UserBankAccountModel.created_at).limit(limit).offset(offset).all()
+        user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.created_at > since).order_by(UserBankAccountModel.created_at).limit(batch_size).offset(offset).all()
         return user_bank_accounts
     
     @staticmethod

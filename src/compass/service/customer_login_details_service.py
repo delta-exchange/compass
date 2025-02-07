@@ -7,16 +7,17 @@ import traceback
 class CustomerLoginDetailsService:
 
     @staticmethod
-    def generate_customer_login_details():
+    def generate_customer_login_details(from_time):
         report_name = f"CLD{DateTimeUtil.get_current_date()}01"
         try:
             batch, login_histories_count = 1, 0
             while True:
                 logger.info(f'generating customer login details for batch {batch}')
-                login_histories = LoginHistoryService.get_batch_by_created_at(batch)
-                if len(login_histories) == 0:
-                    break
-                ReportService.write_report(report_name, CustomerLoginDetailsService.__convert_to_compass_format(login_histories))
+
+                login_histories = LoginHistoryService.get_batch_since(batch, from_time)
+                if len(login_histories) == 0: break
+
+                ReportService.write_report(report_name, CustomerLoginDetailsService.convert_to_compass_format(login_histories))
                 batch += 1
                 login_histories_count += len(login_histories)
             logger.info(f'generated customer login details for {login_histories_count} login histories')
@@ -25,10 +26,10 @@ class CustomerLoginDetailsService:
             traceback.print_exc()
 
     @staticmethod
-    def __convert_to_compass_format(login_histories):
+    def convert_to_compass_format(login_histories):
         login_histories_compass = []
         for login in login_histories:
-            city, state, country = CustomerLoginDetailsService.__get_city_state_country(login.location)
+            city, state, country = CustomerLoginDetailsService.get_city_state_country(login.location)
             login_histories_compass.append({
                 'Customer ID': login.user_id,
                 'CUSTOMERLOGIN_DATETIME': login.created_at,
@@ -43,7 +44,7 @@ class CustomerLoginDetailsService:
         return login_histories_compass
     
     @staticmethod
-    def __get_city_state_country(location):
+    def get_city_state_country(location):
         if location is None:
             return None, None, None
         location = location.split(',')

@@ -11,20 +11,20 @@ class ExchangeTradesService:
     def generate_trade_volume_details():
         report_name = f"ETD{DateTimeUtil.get_current_date()}01"
         logger.info(f'generating exchange trade volume details')
-        tickers = ExchangeTradesService.__get_tickers()
-        tickers_compass = ExchangeTradesService.__convert_to_compass_format(tickers)
+        tickers = ExchangeTradesService.get_tickers()
+        tickers_compass = ExchangeTradesService.convert_to_compass_format(tickers)
         ReportService.write_report(report_name, tickers_compass)
         logger.info(f'generated exchange trade volume details')
 
     @staticmethod
-    def __get_tickers():
+    def get_tickers():
         api_base_url = os.getenv('DELTA_EXCHANGE_API_BASE_URL')
         tickers_response = requests.get(url = f'{api_base_url}/v2/tickers', headers={'accept': 'application/json'})
         tickers = tickers_response.json().get('result')
         return tickers
     
     @staticmethod
-    def __convert_to_compass_format(tickers):
+    def convert_to_compass_format(tickers):
         return [{
             'EXCHANGECODE': 'VA00041101',
             'SCRIPTCODE': ticker.get('product_id'),
