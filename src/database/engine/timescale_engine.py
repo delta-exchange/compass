@@ -9,7 +9,7 @@ class TimescaleEngine:
     def get_session():
         username = os.getenv('TIMESCALE_USERNAME')
         password = os.getenv('TIMESCALE_PASSWORD')
-        host = os.getenv('TIMESCALE_HOSTNAME')
+        host = os.getenv('TIMESCALE_HOST')
         port = os.getenv('TIMESCALE_PORT')
         database = os.getenv('TIMESCALE_DB_NAME')
         url = f'postgresql://{username}:{password}@{host}:{port}/{database}'
