@@ -18,7 +18,7 @@ class TransactionDetailsService:
                 if len(orders) == 0: break
 
                 orders_fills_mapping = TransactionDetailsService.get_order_fills_mapping(orders, from_time)
-                logger.debugger(f"Order fills: {orders_fills_mapping}")
+                logger.debug(f"Order fills: {orders_fills_mapping}")
 
                 users_mapping = TransactionDetailsService.get_users_mapping(orders, orders_fills_mapping)
                 
@@ -126,7 +126,7 @@ class TransactionDetailsService:
                 'BROKERAGEAMOUNT': order_fill.commission if order_fill else None,
                 'ACCOUTACTIVATIONDATE': user.created_at if user else None,
                 'PREVIOUSCLOSEPRICE': None,
-                'AMOUNT': order_fill.notional if order_fill else None,
+                'AMOUNT': (order.size - order.unfilled_size) * order.avg_fill_price if order.avg_fill_price else None,
                 'TRANSACTIONPROCESSED_IPADDRESS': order.meta_data.get('ip'),
                 'TRANSACTIONPROCESSED_ADDRESS': None,
                 'TRANSACTIONPROCESSED_CITY': None,
