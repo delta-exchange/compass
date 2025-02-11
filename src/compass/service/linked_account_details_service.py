@@ -7,25 +7,29 @@ import traceback
 class LinkedAccountDetailsService:
 
     @staticmethod
-    def generate_linked_account_details():
-        report_name = f"LAD{DateTimeUtil.get_current_date()}01"
+    def generate_linked_account_details(from_time, to):
         try:
-            batch, user_bank_accounts_count = 1, 0
+            report_name = f"LAD{DateTimeUtil.get_current_date()}01"
+            logger.info(f'generating linked account details into {report_name}')
+            total_count = 0
             while True:
-                logger.info(f'generating linked account details for batch {batch}')
-                user_bank_accounts = UserBankAccountService.get_batch_by_created_at(batch)
-                if len(user_bank_accounts) == 0:
+                user_bank_accounts = UserBankAccountService.get_between(from_time, to, batch_size=10000)
+                user_bank_accounts_count = len(user_bank_accounts)
+                if user_bank_accounts_count == 0: 
                     break
-                ReportService.write_report(report_name, LinkedAccountDetailsService.__convert_to_compass_format(user_bank_accounts))
-                batch += 1
-                user_bank_accounts_count += len(user_bank_accounts)
-            logger.info(f'generated linked account details for {user_bank_accounts_count} user bank accounts')
+                else:
+                    from_time = user_bank_accounts[-1].updated_at
+                    total_count += user_bank_accounts_count
+                    
+                    ReportService.write_report(report_name, LinkedAccountDetailsService.convert_to_compass_format(user_bank_accounts))
+                
+            logger.info(f'generated total: {total_count} linked account details')
         except Exception as exception:
             logger.error(f'failed to generate linked account details: {exception}')
             traceback.print_exc()
 
     @staticmethod
-    def __convert_to_compass_format(user_bank_accounts):
+    def convert_to_compass_format(user_bank_accounts):
         return [{
             'CustomerId': user_bank_account.user_id,
             'LinkedAccountNo': user_bank_account.account_number,
@@ -37,7 +41,7 @@ class LinkedAccountDetailsService:
             'LinkedAccountOpenedDate': None,
             'LinkedProductCode': None,
             'LinkedProductType': None,
-            'LinkedAccountCurrency': None,
-            'LinkedAccountStatus': None,
+            'LinkedAccountCurrency': 'INR',
+            'LinkedAccountStatus': user_bank_account.custodian_status,
             'AccountLinkedDateTime': user_bank_account.created_at
         } for user_bank_account in user_bank_accounts]

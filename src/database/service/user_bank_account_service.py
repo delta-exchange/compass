@@ -5,10 +5,9 @@ from src.database.model import UserBankAccountModel
 class UserBankAccountService:
     
     @staticmethod
-    def get_batch_by_created_at(batch, limit = 500, created_at = DateTimeUtil.get_24hrs_ago()):
-        offset = (batch -1) * limit
+    def get_between(since, to, batch_size = 10000):
         session = WalletEngine.get_session()
-        user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.created_at > created_at, UserBankAccountModel.is_active == True).order_by(UserBankAccountModel.created_at).limit(limit).offset(offset).all()
+        user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.updated_at > since, UserBankAccountModel.updated_at <= to).order_by(UserBankAccountModel.updated_at).limit(batch_size).all()
         return user_bank_accounts
     
     @staticmethod
@@ -16,4 +15,9 @@ class UserBankAccountService:
         session = WalletEngine.get_session()
         user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.user_id.in_(user_ids), UserBankAccountModel.is_active == True).all()
         return user_bank_accounts
-        
+    
+    @staticmethod
+    def get_by_ids(ids): 
+        session = WalletEngine.get_session()
+        user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.id.in_(ids)).all()
+        return user_bank_accounts

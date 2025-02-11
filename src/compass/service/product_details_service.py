@@ -5,23 +5,26 @@ from src.util import logger, DateTimeUtil
 class ProductDetailsService:
 
     @staticmethod
-    def generate_product_details():
+    def generate_product_details(from_time, to_time):
         report_name = f"PRD{DateTimeUtil.get_current_date()}01"
-        batch, total_products = 1, 0
-        while(True):
-            logger.info(f'fetching products batch {batch}')
-            products_batch = ProductService.get_batch_by_created_at(batch)
-            if len(products_batch) == 0:
+        logger.info(f'generating products products into {report_name}')
+        total_count = 0
+        while True:
+            products = ProductService.get_between(from_time, to_time, batch_size=10000)
+            products_count = len(products)
+            if products_count == 0: 
                 break
-            products_compass = ProductDetailsService.__convert_to_compass_format(products_batch)
-            ReportService.write_report(report_name, products_compass)
-            total_products += len(products_batch)
-            batch += 1   
-
-        logger.info(f'generated total {total_products} product details')
+            else:
+                from_time = products[-1].created_at
+                total_count += len(products)
+                
+                products_compass = ProductDetailsService.convert_to_compass_format(products)
+                ReportService.write_report(report_name, products_compass)
+                
+        logger.info(f'generated total {total_count} product details')
 
     @staticmethod
-    def __convert_to_compass_format(products):
+    def convert_to_compass_format(products):
         return list(map(lambda product: {
             "SCRIPCODE": product.id,
             "SCRIPNAME": product.symbol,
