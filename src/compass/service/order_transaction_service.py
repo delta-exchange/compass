@@ -19,7 +19,6 @@ class OrderTransactionDetailsService:
                     break
                 else:
                     from_time = orders[-1].updated_at
-                    logger.info(f'from_time: {from_time}')
                     total_count += order_count
 
                     users_mapping = OrderTransactionDetailsService.get_users_mapping(orders)

@@ -44,7 +44,7 @@ class CompassGenerator:
             CustomerLastTransactionDetailsService.generate_last_transaction_details(from_time, now)
 
             CompassGenerator.add_blank_reports_for_missing_data(reports_directory)
-            SCPTransfer.push_files_to_remote_server_by_directory(reports_directory, os.path.join(reports_directory, f"EOD{DateTimeUtil.get_current_date()}.csv"))
+            SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
             SlackNotifier.send_alert('Compass cron\n```status: Success\n```')
         except:
             exception_message = traceback.format_exc()
