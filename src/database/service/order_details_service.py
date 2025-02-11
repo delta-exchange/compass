@@ -1,16 +1,21 @@
 from src.database.engine import LedgerEngine
 from src.database.model import OrderDetailsModel
+from sqlalchemy.sql import distinct
 from sqlalchemy import func
-from src.util import DateTimeUtil
 
 class OrderDetailsService:
 
     @staticmethod
-    def get_batch_since(batch, since, batch_size = 500):
-        offset = (batch -1) * batch_size
+    def get_between(since, to, batch_size = 500):
         session = LedgerEngine.get_session()
-        orders = session.query(OrderDetailsModel).filter(OrderDetailsModel.updated_at > since).order_by(OrderDetailsModel.updated_at).limit(batch_size).offset(offset).all()
+        orders = session.query(OrderDetailsModel).filter(OrderDetailsModel.updated_at > since, OrderDetailsModel.updated_at <= to, OrderDetailsModel.avg_fill_price.is_(None)).order_by(OrderDetailsModel.updated_at).limit(batch_size).all()
         return orders
+    
+    @staticmethod
+    def get_user_ids_between(since, to):
+        session = LedgerEngine.get_session()
+        user_ids = session.query(distinct(OrderDetailsModel.user_id)).filter(OrderDetailsModel.updated_at > since, OrderDetailsModel.updated_at <= to).order_by(OrderDetailsModel.updated_at).all()
+        return list({user_id[0] for user_id in user_ids})
     
     @staticmethod
     def get_first_and_last_by_user_ids(user_ids):
@@ -20,10 +25,4 @@ class OrderDetailsService:
             func.min(OrderDetailsModel.created_at).label("min_created_at"),
             func.max(OrderDetailsModel.created_at).label("max_created_at")
         ).filter(OrderDetailsModel.user_id.in_(user_ids)).group_by(OrderDetailsModel.user_id).all()
-        return orders
-    
-    @staticmethod
-    def get_by_user_ids_and_created_at(user_ids, created_at):
-        session = LedgerEngine.get_session()
-        orders = session.query(OrderDetailsModel).filter(OrderDetailsModel.user_id.in_(user_ids), OrderDetailsModel.created_at > created_at).all()
         return orders

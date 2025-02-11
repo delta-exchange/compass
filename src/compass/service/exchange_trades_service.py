@@ -43,5 +43,6 @@ class ExchangeTradesService:
             'TOTALTRADES': None,
             'DAILYVOLUME': ticker.get('volume'),
             'DAILYVALUE': ticker.get('turnover'),
-            'STRIKEPRICE': ticker.get('strike_price')
+            'STRIKEPRICE': ticker.get('strike_price'),
+            'SCRIPTRATEDATE': None
         } for ticker in tickers]

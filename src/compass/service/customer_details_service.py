@@ -1,30 +1,31 @@
 from src.database.service import UserDetailsService, KycDocumentsService
 from .report_service import ReportService
-from src.util import logger, DateTimeUtil
+from src.util import logger, DateTimeUtil, AddressUtil
 
 import traceback
 
 class CustomerDetailsService:
 
     @staticmethod
-    def generate_customer_details_details(from_time):
-        report_name = f"CST{DateTimeUtil.get_current_date()}01"
+    def generate_customer_details_details(from_time, to):
         try:
-            batch, users_count = 1, 0
+            report_name = f"CST{DateTimeUtil.get_current_date()}01"
+            logger.info(f'generating customer details into {report_name}')
+            total_count = 0
             while True:
-                logger.info(f'generating customer details for batch {batch}')
+                users = UserDetailsService.get_between(from_time, to, batch_size=500)
+                users_count = len(users)
+                if users_count == 0: 
+                    break
+                else:
+                    from_time = users[-1].created_at
+                    total_count += len(users)
 
-                users = UserDetailsService.get_batch_by_since(batch, from_time)
-                if len(users) == 0: break
-
-                users_mapping = CustomerDetailsService.get_users_mapping(users)
-
-                user_kyc_details_mapping = KycDocumentsService.get_by_user_ids(list({user.id for user in users_mapping.values()}))
-
-                ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping))
-                batch += 1
-                users_count += len(users)
-            logger.info(f'generated customer details for {users_count} users')
+                    users_mapping = CustomerDetailsService.get_users_mapping(users)
+                    user_kyc_details_mapping = KycDocumentsService.get_by_user_ids(list({user.id for user in users_mapping.values() if user.is_kyc_done}))
+                    ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping))
+                
+            logger.info(f'generated customer details for {total_count} users')
         except Exception as exception:
             logger.error(f'failed to generate customer details: {exception}')
             traceback.print_exc()
@@ -35,6 +36,8 @@ class CustomerDetailsService:
 
         subaccount_users_parent_id_mapping = {user.id: user.parent_user_id for user in users if user.parent_user_id}
         parent_user_ids = list(subaccount_users_parent_id_mapping.values())
+        if len(parent_user_ids) == 0: 
+            return users_mapping
         parent_users = UserDetailsService.get_by_user_ids(parent_user_ids)
         parent_users_mapping = {user.id: user for user in parent_users}
         
@@ -53,10 +56,13 @@ class CustomerDetailsService:
             if not main_user:
                 logger.debug(f"user with id: {user.id} not found")
             kyc = user_kyc_details_mapping.get(main_user.id, {}) if main_user else {}
+            pincode, state = AddressUtil.extract_pincode_state(kyc.get("address"))
+            if not state:
+                state = main_user.region if main_user else None
         
             users_compass.append({
                 'Customer ID': user.id,
-                'Constitution Type': 'Individual',
+                'Constitutiopn Type': 'Individual',
                 'Customer Type': 'Individual',
                 'PRIMARY_SEGMENT': 'Futures & Options',
                 'Customer Name': f'{main_user.first_name} {main_user.last_name}' if (main_user and main_user.first_name and main_user.last_name) else None,
@@ -200,8 +206,8 @@ class CustomerDetailsService:
                 'CUSTOMERONBOARDING_IPADDRESS': None,
                 'CUSTOMERONBOARDING_ADDRESS': kyc.get("address"),
                 'CUSTOMERONBOARDING_CITY': None,
-                'CUSTOMERONBOARDING_PROVINCE_OR_STATE': main_user.region if main_user else None,
-                'CUSTOMERONBOARDING_PINCODE': None,
+                'CUSTOMERONBOARDING_PROVINCE_OR_STATE': state,
+                'CUSTOMERONBOARDING_PINCODE': pincode,
                 'CUSTOMERONBOARDING_COUNTRY': main_user.country if main_user else None,
                 'CUSTOMERONBOARDING_GEOLOCATION': None,
                 'CUSTOMER_FAMILYCODE/CUSTOMER_GROUPCODE': None,

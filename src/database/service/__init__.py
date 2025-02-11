@@ -5,3 +5,5 @@ from .order_details_service import OrderDetailsService
 from .fills_service import FillsService
 from .product_service import ProductService
 from .kyc_details_service import KycDocumentsService
+from .deposit_service import DepositService
+from.withdrawal_service import WithdrawalService

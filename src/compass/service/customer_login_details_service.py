@@ -7,20 +7,23 @@ import traceback
 class CustomerLoginDetailsService:
 
     @staticmethod
-    def generate_customer_login_details(from_time):
-        report_name = f"CLD{DateTimeUtil.get_current_date()}01"
+    def generate_customer_login_details(from_time, to):
         try:
-            batch, login_histories_count = 1, 0
+            report_name = f"CLD{DateTimeUtil.get_current_date()}01"
+            logger.info(f'generating customer login details into {report_name}')
+            total_count = 0
             while True:
-                logger.info(f'generating customer login details for batch {batch}')
+                login_histories = LoginHistoryService.get_since(from_time, to, batch_size=10000)
+                login_histories_count = len(login_histories)
+                if login_histories_count == 0: 
+                    break
+                else:
+                    from_time = login_histories[-1].created_at
+                    total_count += login_histories_count
 
-                login_histories = LoginHistoryService.get_batch_since(batch, from_time)
-                if len(login_histories) == 0: break
-
-                ReportService.write_report(report_name, CustomerLoginDetailsService.convert_to_compass_format(login_histories))
-                batch += 1
-                login_histories_count += len(login_histories)
-            logger.info(f'generated customer login details for {login_histories_count} login histories')
+                    ReportService.write_report(report_name, CustomerLoginDetailsService.convert_to_compass_format(login_histories))
+                
+            logger.info(f'generated total {total_count} customer login details')
         except Exception as exception:
             logger.error(f'failed to generate customer login details: {exception}')
             traceback.print_exc()
@@ -29,7 +32,7 @@ class CustomerLoginDetailsService:
     def convert_to_compass_format(login_histories):
         login_histories_compass = []
         for login in login_histories:
-            city, state, country = CustomerLoginDetailsService.get_city_state_country(login.location)
+            city, state, country = login.location.split(', ') if login.location else (None,)*3 
             login_histories_compass.append({
                 'Customer ID': login.user_id,
                 'CUSTOMERLOGIN_DATETIME': login.created_at,
@@ -42,11 +45,3 @@ class CustomerLoginDetailsService:
                 'CUSTOMERLOGIN_GEOLOCATION': login.location
             })
         return login_histories_compass
-    
-    @staticmethod
-    def get_city_state_country(location):
-        if location is None:
-            return None, None, None
-        location = location.split(',')
-        city, state, country = location[0].strip(), location[1].strip(), location[2].strip()
-        return city, state, country

@@ -5,10 +5,9 @@ from src.database.model import LoginHistoryModel
 class LoginHistoryService:
     
     @staticmethod
-    def get_batch_since(batch, since, batch_size = 500):
-        offset = (batch -1) * batch_size
+    def get_since(since, to, batch_size = 10000):
         session = IamEngine.get_session()
-        login_histories = session.query(LoginHistoryModel).filter(LoginHistoryModel.created_at > since).order_by(LoginHistoryModel.created_at).limit(batch_size).offset(offset).all()
+        login_histories = session.query(LoginHistoryModel).filter(LoginHistoryModel.created_at > since, LoginHistoryModel.created_at <= to).order_by(LoginHistoryModel.created_at).limit(batch_size).all()
         return login_histories
     
     @staticmethod

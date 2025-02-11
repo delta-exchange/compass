@@ -5,3 +5,5 @@ from .order_details_model import OrderDetailsModel
 from .fills_model import FillsModel
 from .product_model import ProductModel
 from .kyc_document_model import KycDocumentModel
+from .deposit_model import DepositModel
+from .withdrawal_model import WithdrawalModel

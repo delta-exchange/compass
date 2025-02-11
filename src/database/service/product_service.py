@@ -4,10 +4,9 @@ from src.database.model import ProductModel
 
 class ProductService:
     @staticmethod
-    def get_batch_since(batch, since, batch_size = 500):
-        offset = (batch -1) * batch_size
+    def get_between(since, to, batch_size = 10000):
         session = LedgerEngine.get_session()
-        products = session.query(ProductModel).filter(ProductModel.created_at > since).order_by(ProductModel.created_at).limit(batch_size).offset(offset).all()
+        products = session.query(ProductModel).filter(ProductModel.created_at > since, ProductModel.created_at <= to).order_by(ProductModel.created_at).limit(batch_size).all()
         return products
     
     @staticmethod

@@ -12,8 +12,6 @@ class TimescaleEngine:
         host = os.getenv('TIMESCALE_HOST')
         port = os.getenv('TIMESCALE_PORT')
         database = os.getenv('TIMESCALE_DB_NAME')
-        url = f'postgresql://{username}:{password}@{host}:{port}/{database}'
-        logger.debug(f"time_scale url: {url}")
         engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{database}')
         Session = sessionmaker(bind=engine)
         return Session()

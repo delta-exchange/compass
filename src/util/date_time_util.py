@@ -9,6 +9,11 @@ class DateTimeUtil:
         return updated_since
     
     @staticmethod
+    def get_now():
+        now = datetime.now(timezone.utc)
+        return now.strftime('%Y-%m-%dT%H:%M:%SZ')
+        
+    @staticmethod
     def get_date_from_string(date_string):
         return datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
     
