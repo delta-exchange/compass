@@ -1,6 +1,7 @@
-from src.database.service import OrderDetailsService, FillsService, UserDetailsService, UserBankAccountService, ProductService
+from src.database.service import FillsService, UserDetailsService, UserBankAccountService, ProductService, LoginHistoryService
 from .report_service import ReportService
-from src.util import logger, DateTimeUtil
+from src.util import logger, DateTimeUtil, AddressUtil
+from datetime import datetime, timezone, timedelta
 
 import traceback
 
@@ -18,9 +19,6 @@ class FillTransactionDetailsService:
                 if len(order_fills) == 0: 
                     break
                 else:
-                    from_time = order_fills[-1].created_at
-                    total_count += order_fills_count
-
                     users_mapping = FillTransactionDetailsService.get_users_mapping(order_fills)
                     
                     user_banks = UserBankAccountService.get_by_user_ids(list({user.id for user in users_mapping.values()}))
@@ -29,8 +27,19 @@ class FillTransactionDetailsService:
                     products = ProductService.get_by_product_symbols(list({fill.product_symbol for fill in order_fills}))
                     products_mapping = {product.symbol: product for product in products}
 
-                    transactions_compass = FillTransactionDetailsService.convert_to_compass_format(order_fills, users_mapping, user_banks_mapping, products_mapping)
+                    logins = LoginHistoryService.get_by_user_id_and_since([user_id for user_id in users_mapping], datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc) - timedelta(days=15))
+                    logins_mapping = {}
+                    for login in logins:
+                        if not logins_mapping.get(login.user_id):
+                            logins_mapping[login.user_id] = [login]
+                        else:
+                            logins_mapping[login.user_id].append(login)
+
+                    transactions_compass = FillTransactionDetailsService.convert_to_compass_format(order_fills, users_mapping, user_banks_mapping, products_mapping, logins_mapping)
                     ReportService.write_report(report_name, transactions_compass)
+
+                    from_time = order_fills[-1].created_at
+                    total_count += order_fills_count
                 
             logger.info(f'generated totoal {total_count} transaction details')            
         except Exception as exception:
@@ -55,7 +64,7 @@ class FillTransactionDetailsService:
         return users_mapping
     
     @staticmethod
-    def convert_to_compass_format(orders_fills, users_mapping, user_banks_mapping, products_mapping):
+    def convert_to_compass_format(orders_fills, users_mapping, user_banks_mapping, products_mapping, logins_mapping):
         transactions_compass = []
         for fill in orders_fills:
             product = products_mapping.get(fill.product_symbol)
@@ -63,6 +72,9 @@ class FillTransactionDetailsService:
             user_bank = user_banks_mapping.get(user.id) if user else None
             counter_party_user_id = fill.counter_party_user_id
             counter_party_user = users_mapping.get(counter_party_user_id) if counter_party_user_id else None
+            user_logins = logins_mapping.get(user.id, []) if user else []
+            login = next((login for login in user_logins[::-1] if login.created_at <= datetime.strptime(fill.created_at, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)), None)
+            city, state, country = AddressUtil.get_city_state_country_by_login(login)
 
             transactions_compass.append({
                 'TransactionBatchId': None,
@@ -106,19 +118,19 @@ class FillTransactionDetailsService:
                 'CONVERSIONRATE': 85,
                 'NARRATION': None,
                 'USERID': fill.user_id,
-                'CHANNELTYPE': None,
+                'CHANNELTYPE': fill.meta_data.get("source"),
                 'LASTTRADEDPRICE': fill.price,
                 'DELIVERYSTATUS': None,
                 'BROKERAGEAMOUNT': fill.commission,
                 'ACCOUTACTIVATIONDATE': user.created_at if user else None,
                 'PREVIOUSCLOSEPRICE': None,
-                'AMOUNT': fill.size * fill.price,
-                'TRANSACTIONPROCESSED_IPADDRESS': None,
-                'TRANSACTIONPROCESSED_ADDRESS': None,
-                'TRANSACTIONPROCESSED_CITY': None,
-                'TRANSACTIONPROCESSED_PROVINCE_OR_STATE': None,
+                'AMOUNT': fill.notional,
+                'TRANSACTIONPROCESSED_IPADDRESS': login.ip if login else None,
+                'TRANSACTIONPROCESSED_ADDRESS': login.location if login else None,
+                'TRANSACTIONPROCESSED_CITY': city,
+                'TRANSACTIONPROCESSED_PROVINCE_OR_STATE': state,
                 'TRANSACTIONPROCESSED_PINCODE': None,
-                'TRANSACTIONPROCESSED_COUNTRY': None,
+                'TRANSACTIONPROCESSED_COUNTRY': country,
                 'TRANSACTIONPROCESSED_GEOLOCATION': None,
                 'TRANSACTION_IDENTIFIER': 'ORDER_FILL'
             })

@@ -1,15 +1,15 @@
-from src.database.service import DepositService, UserDetailsService, UserBankAccountService
+from src.database.service import DepositService, UserDetailsService, UserBankAccountService, LoginHistoryService
 from .report_service import ReportService
-from src.util import logger, DateTimeUtil
+from src.util import logger, DateTimeUtil, AddressUtil
 import traceback
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 class DepositTransactionService:
 
     @staticmethod
     def generate_transaction_details(from_time, to):
         try:
-            report_name = f"TRN{DateTimeUtil.get_current_date()}03"
+            report_name = f"TRN{DateTimeUtil.get_current_date()}02"
             logger.info(f'generating deposit transaction details into {report_name}')
             total_count = 0
             since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
@@ -28,7 +28,15 @@ class DepositTransactionService:
                     user_banks = UserBankAccountService.get_by_ids(list({deposit.user_bank_details_id for deposit in deposits}))
                     deposit_banks_mapping = {user_bank.id: user_bank for user_bank in user_banks}
 
-                    transactions_compass = DepositTransactionService.convert_to_compass_format(deposits, users_mapping, deposit_banks_mapping)
+                    logins = LoginHistoryService.get_by_user_id_and_since([user_id for user_id in users_mapping], since - timedelta(days=15))
+                    logins_mapping = {}
+                    for login in logins:
+                        if not logins_mapping.get(login.user_id):
+                            logins_mapping[login.user_id] = [login]
+                        else:
+                            logins_mapping[login.user_id].append(login)
+
+                    transactions_compass = DepositTransactionService.convert_to_compass_format(deposits, users_mapping, deposit_banks_mapping, logins_mapping)
                     ReportService.write_report(report_name, transactions_compass)
                 
             logger.info(f'generated total {total_count} deposit transaction details')            
@@ -54,11 +62,14 @@ class DepositTransactionService:
         return users_mapping
     
     @staticmethod
-    def convert_to_compass_format(deposits, users_mapping, deposit_banks_mapping):
+    def convert_to_compass_format(deposits, users_mapping, deposit_banks_mapping, logins_mapping):
         transactions_compass = []
         for deposit in deposits:
             user = users_mapping.get(deposit.user_id)
             user_bank = deposit_banks_mapping.get(deposit.user_bank_details_id) if user else None
+            user_logins = logins_mapping.get(user.id, []) if user else []
+            login = next((login for login in user_logins[::-1] if login.created_at <= deposit.updated_at), None)
+            city, state, country = AddressUtil.get_city_state_country_by_login(login)
 
             transactions_compass.append({
                 'TransactionBatchId': None,
@@ -109,11 +120,12 @@ class DepositTransactionService:
                 'ACCOUTACTIVATIONDATE': user.created_at if user else None,
                 'PREVIOUSCLOSEPRICE': None,
                 'AMOUNT': deposit.fiat_amount,
-                'TRANSACTIONPROCESSED_ADDRESS': None,
-                'TRANSACTIONPROCESSED_CITY': None,
-                'TRANSACTIONPROCESSED_PROVINCE_OR_STATE': None,
+                'TRANSACTIONPROCESSED_IPADDRESS': login.ip if login else None,
+                'TRANSACTIONPROCESSED_ADDRESS': login.location if login else None,
+                'TRANSACTIONPROCESSED_CITY': city,
+                'TRANSACTIONPROCESSED_PROVINCE_OR_STATE': state,
                 'TRANSACTIONPROCESSED_PINCODE': None,
-                'TRANSACTIONPROCESSED_COUNTRY': None,
+                'TRANSACTIONPROCESSED_COUNTRY': country,
                 'TRANSACTIONPROCESSED_GEOLOCATION': None,
                 'TRANSACTION_IDENTIFIER': 'FIAT_DEPOSIT'
             })

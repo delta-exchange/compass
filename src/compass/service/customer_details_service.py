@@ -1,4 +1,4 @@
-from src.database.service import UserDetailsService, KycDocumentsService
+from src.database.service import UserDetailsService, KycDocumentsService, LoginHistoryService
 from .report_service import ReportService
 from src.util import logger, DateTimeUtil, AddressUtil
 
@@ -9,6 +9,7 @@ class CustomerDetailsService:
     @staticmethod
     def generate_customer_details_details(from_time, to):
         try:
+            login_city_list = CustomerDetailsService.get_login_city_list()
             report_name = f"CST{DateTimeUtil.get_current_date()}01"
             logger.info(f'generating customer details into {report_name}')
             total_count = 0
@@ -23,12 +24,19 @@ class CustomerDetailsService:
 
                     users_mapping = CustomerDetailsService.get_users_mapping(users)
                     user_kyc_details_mapping = KycDocumentsService.get_by_user_ids(list({user.id for user in users_mapping.values() if user.is_kyc_done}))
-                    ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping))
+                    ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping, login_city_list))
                 
             logger.info(f'generated customer details for {total_count} users')
         except Exception as exception:
             logger.error(f'failed to generate customer details: {exception}')
             traceback.print_exc()
+
+    @staticmethod
+    def get_login_city_list():
+        locations = LoginHistoryService.get_unique_locations()
+        city_state_country_list = [AddressUtil.get_city_state_country_by_location(location) for location in locations if location]
+        login_city_list = [city_state_country[0] for city_state_country in city_state_country_list if city_state_country[0]]
+        return login_city_list
 
     @staticmethod
     def get_users_mapping(users):
@@ -49,14 +57,14 @@ class CustomerDetailsService:
     
 
     @staticmethod
-    def convert_to_compass_format(users, users_mapping, user_kyc_details_mapping):
+    def convert_to_compass_format(users, users_mapping, user_kyc_details_mapping, login_city_list):
         users_compass = []
         for user in users:
             main_user = users_mapping.get(user.id)
             if not main_user:
                 logger.debug(f"user with id: {user.id} not found")
             kyc = user_kyc_details_mapping.get(main_user.id, {}) if main_user else {}
-            pincode, state = AddressUtil.extract_pincode_state(kyc.get("address"))
+            pincode, state, city = AddressUtil.extract_pincode_state_city(kyc.get("address"), login_city_list)
             if not state:
                 state = main_user.region if main_user else None
         
@@ -139,8 +147,8 @@ class CustomerDetailsService:
                 'PASSPORT_COUNTRYOF RESIDENCE': None,
                 'NPR': None,
                 'DIN / DPIN': None,
-                'REKYC_Status': main_user.is_kyc_done if main_user else None,
-                'REKYC_Date': None,
+                'REKYC_Status': main_user.is_kyc_refresh_required if main_user else None,
+                'REKYC_Date': main_user.kyc_expiry_date if main_user else None,
                 'FCRA status': None,
                 'FCRA Registration State': None,
                 'FCRA Registration Number': None,
@@ -205,7 +213,7 @@ class CustomerDetailsService:
                 'UPDATE_TIMESTAMP': user.updated_at,
                 'CUSTOMERONBOARDING_IPADDRESS': None,
                 'CUSTOMERONBOARDING_ADDRESS': kyc.get("address"),
-                'CUSTOMERONBOARDING_CITY': None,
+                'CUSTOMERONBOARDING_CITY': city,
                 'CUSTOMERONBOARDING_PROVINCE_OR_STATE': state,
                 'CUSTOMERONBOARDING_PINCODE': pincode,
                 'CUSTOMERONBOARDING_COUNTRY': main_user.country if main_user else None,

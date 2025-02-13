@@ -38,7 +38,6 @@ class CompassGenerator:
             
             DepositTransactionService.generate_transaction_details(from_time, now)
             WithdrawalTransactionService.generate_transaction_details(from_time, now)
-            OrderTransactionDetailsService.generate_transaction_details(from_time, now)
             FillTransactionDetailsService.generate_transaction_details(from_time, now)
 
             CustomerLastTransactionDetailsService.generate_last_transaction_details(from_time, now)
