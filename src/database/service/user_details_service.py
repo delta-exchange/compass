@@ -7,7 +7,7 @@ class UserDetailsService:
     @staticmethod
     def get_between(since, to, batch_size = 500):
         session = IamEngine.get_session()
-        users = session.query(UserDetailsModel).filter(UserDetailsModel.created_at > since, UserDetailsModel.created_at <= to).order_by(UserDetailsModel.created_at).limit(batch_size).all()
+        users = session.query(UserDetailsModel).filter(UserDetailsModel.updated_at > since, UserDetailsModel.updated_at <= to).order_by(UserDetailsModel.updated_at).limit(batch_size).all()
         return users
     
     @staticmethod

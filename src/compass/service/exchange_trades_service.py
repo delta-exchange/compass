@@ -40,7 +40,7 @@ class ExchangeTradesService:
             'TODAYSLOW': ticker.get('low'),
             'DAILYSETTLPRICE': ticker.get('close'),
             'PREVIOUSCLOSE': None,
-            'TOTALTRADES': None,
+            'TOTALTRADES': ticker.get('volume'),
             'DAILYVOLUME': ticker.get('volume'),
             'DAILYVALUE': ticker.get('turnover'),
             'STRIKEPRICE': ticker.get('strike_price'),

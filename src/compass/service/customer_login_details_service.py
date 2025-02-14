@@ -13,7 +13,7 @@ class CustomerLoginDetailsService:
             logger.info(f'generating customer login details into {report_name}')
             total_count = 0
             while True:
-                login_histories = LoginHistoryService.get_since(from_time, to, batch_size=10000)
+                login_histories = LoginHistoryService.get_between(from_time, to, batch_size=10000)
                 login_histories_count = len(login_histories)
                 if login_histories_count == 0: 
                     break

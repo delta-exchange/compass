@@ -94,7 +94,7 @@ class FillTransactionDetailsService:
                 'CUSTOMERID': fill.user_id,
                 'ACCOUNTNO': user_bank.account_number if user_bank else None,
                 'CUSTOMERNAME': f'{user.first_name} {user.last_name}' if user else None,
-                'TRADESTATUS': 1,
+                'TRADESTATUS': "filled",
                 'BRANCHCODE': user_bank.ifsc_code if user_bank else None,
                 'TRADEPRICE': fill.price,
                 'TRADEQUANTITY': fill.size,

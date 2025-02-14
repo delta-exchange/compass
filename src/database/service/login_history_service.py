@@ -7,7 +7,7 @@ from sqlalchemy import func, or_
 class LoginHistoryService:
     
     @staticmethod
-    def get_since(since, to, batch_size = 10000):
+    def get_between(since, to, batch_size = 10000):
         session = IamEngine.get_session()
         login_histories = session.query(LoginHistoryModel).filter(LoginHistoryModel.created_at > since, LoginHistoryModel.created_at <= to).order_by(LoginHistoryModel.created_at).limit(batch_size).all()
         return login_histories
