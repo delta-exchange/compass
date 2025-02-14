@@ -27,16 +27,8 @@ class WithdrawalTransactionService:
                     
                     user_banks = UserBankAccountService.get_by_ids(list({withdrawal.user_bank_detail_id for withdrawal in withdrawals}))
                     withdrawal_banks_mapping = {user_bank.id: user_bank for user_bank in user_banks}
-
-                    logins = LoginHistoryService.get_by_user_id_and_since([user_id for user_id in users_mapping], since - timedelta(days=15))
-                    logins_mapping = {}
-                    for login in logins:
-                        if not logins_mapping.get(login.user_id):
-                            logins_mapping[login.user_id] = [login]
-                        else:
-                            logins_mapping[login.user_id].append(login)
                 
-                    transactions_compass = WithdrawalTransactionService.convert_to_compass_format(withdrawals, users_mapping, withdrawal_banks_mapping, logins_mapping)
+                    transactions_compass = WithdrawalTransactionService.convert_to_compass_format(withdrawals, users_mapping, withdrawal_banks_mapping)
                     ReportService.write_report(report_name, transactions_compass)
                 
             logger.info(f'generated withdrawal transaction details for {total_count}')            
@@ -62,15 +54,14 @@ class WithdrawalTransactionService:
         return users_mapping
     
     @staticmethod
-    def convert_to_compass_format(withdrawals, users_mapping, withdrawal_banks_mapping, logins_mapping):
+    def convert_to_compass_format(withdrawals, users_mapping, withdrawal_banks_mapping):
         transactions_compass = []
         for withdrawal in withdrawals:
             user = users_mapping.get(withdrawal.user_id)
             user_bank = withdrawal_banks_mapping.get(withdrawal.user_bank_detail_id) if user else None
-            logger.info(f"{user_bank.account_number if user_bank else None}")
-            user_logins = logins_mapping.get(user.id, []) if user else []
-            login = next((login for login in user_logins[::-1] if login.created_at <= withdrawal.updated_at), None)
-            city, state, country = AddressUtil.get_city_state_country_by_login(login)
+            location = withdrawal.transaction_meta.get("location") if  withdrawal.transaction_meta else None
+            city, state, country = AddressUtil.get_city_state_country_by_location(location)
+            state_mapping = {1: "initiated", 2: "complete", 3: "cancelled", 4: "ready_to_process", 5: "ready_to_withdraw", 6: "ready_for_internal_processing"}
 
             transactions_compass.append({
                 'TransactionBatchId': None,
@@ -81,7 +72,7 @@ class WithdrawalTransactionService:
                 'SEGMENTTYPE': 'Derivatives',
                 'INSTRUCTIONTYPE': 'WITHDRAWAL',
                 'TRANSACTIONTYPE': 'WITHDRAWAL',
-                'TRANSACTIONDATETIME': withdrawal.created_at,
+                'TRANSACTIONDATETIME': withdrawal.updated_at,
                 'FUTURE_OPTIONS_FLAG': False,
                 'CALLORPUTTYPE': None,
                 'STRIKEPRICE': None,
@@ -90,12 +81,12 @@ class WithdrawalTransactionService:
                 'CUSTOMERID': withdrawal.user_id,
                 'ACCOUNTNO': user_bank.account_number if user_bank else None,
                 'CUSTOMERNAME': f'{user.first_name} {user.last_name}' if user else None,
-                'TRADESTATUS': withdrawal.custodian_status,
+                'TRADESTATUS': state_mapping.get(withdrawal.state, 'unconfirmed'),
                 'BRANCHCODE': user_bank.ifsc_code if user_bank else None,
                 'TRADEPRICE': None,
                 'TRADEQUANTITY': None,
                 'NETPRICE': None,
-                'ORDERNO': withdrawal.withdrawal_reference_id,
+                'ORDERNO': withdrawal.reference_id,
                 'ORDERDATETIME': withdrawal.created_at,
                 'SETTLEMENTDAYS': None,
                 'PARTICIPANTCODE': None,
@@ -109,20 +100,20 @@ class WithdrawalTransactionService:
                 'COUNTERCUSTOMERID': None,
                 'COUNTERPARTYNAME': withdrawal.custodian,
                 'COUNTERPARTYTYPE': 'VENDOR',
-                'ACCTCURRENCYCODE': withdrawal.fiat_currency,
-                'CURRENCYCODE':  withdrawal.fiat_currency,
+                'ACCTCURRENCYCODE': withdrawal.fiat_asset,
+                'CURRENCYCODE':  withdrawal.fiat_asset,
                 'CONVERSIONRATE': 1,
                 'NARRATION': None,
                 'USERID': withdrawal.user_id,
-                'CHANNELTYPE': None,
+                'CHANNELTYPE': withdrawal.audit.get("matched_login_details", {}).get("source") if withdrawal.audit else None,
                 'LASTTRADEDPRICE': None,
                 'DELIVERYSTATUS': None,
                 'BROKERAGEAMOUNT': 0.0,
                 'ACCOUTACTIVATIONDATE': user.created_at if user else None,
                 'PREVIOUSCLOSEPRICE': None,
                 'AMOUNT': withdrawal.fiat_amount,
-                 'TRANSACTIONPROCESSED_IPADDRESS': login.ip if login else None,
-                'TRANSACTIONPROCESSED_ADDRESS': login.location if login else None,
+                'TRANSACTIONPROCESSED_IPADDRESS': withdrawal.transaction_meta.get("client_ip_address") if  withdrawal.transaction_meta else None,
+                'TRANSACTIONPROCESSED_ADDRESS': withdrawal.transaction_meta.get("location") if  withdrawal.transaction_meta else None,
                 'TRANSACTIONPROCESSED_CITY': city,
                 'TRANSACTIONPROCESSED_PROVINCE_OR_STATE': state,
                 'TRANSACTIONPROCESSED_PINCODE': None,
