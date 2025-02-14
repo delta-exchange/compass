@@ -15,7 +15,7 @@ class ProductDetailsService:
             if products_count == 0: 
                 break
             else:
-                from_time = products[-1].created_at
+                from_time = products[-1].updated_at
                 total_count += len(products)
                 
                 products_compass = ProductDetailsService.convert_to_compass_format(products)

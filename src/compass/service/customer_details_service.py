@@ -19,7 +19,7 @@ class CustomerDetailsService:
                 if users_count == 0: 
                     break
                 else:
-                    from_time = users[-1].created_at
+                    from_time = users[-1].updated_at
                     total_count += len(users)
 
                     users_mapping = CustomerDetailsService.get_users_mapping(users)
@@ -209,7 +209,7 @@ class CustomerDetailsService:
                 'Alternate AddressLocality': None,
                 'Alternate AddressNon-Indian Pincode': None,
                 'Alternate AddressCity / Village / Town': None, 
-                'DATA_SOURCE': main_user.tracking_info.get("vendor") if main_user.tracking_info else None,
+                'DATA_SOURCE': None,
                 'UPDATE_TIMESTAMP': user.updated_at,
                 'CUSTOMERONBOARDING_IPADDRESS': None,
                 'CUSTOMERONBOARDING_ADDRESS': kyc.get("address"),
