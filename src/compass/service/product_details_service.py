@@ -10,12 +10,13 @@ class ProductDetailsService:
         logger.info(f'generating products products into {report_name}')
         total_count = 0
         while True:
+            logger.info(f"From: {from_time}")
             products = ProductService.get_between(from_time, to_time, batch_size=10000)
             products_count = len(products)
             if products_count == 0: 
                 break
             else:
-                from_time = products[-1].created_at
+                from_time = products[-1].updated_at
                 total_count += len(products)
                 
                 products_compass = ProductDetailsService.convert_to_compass_format(products)
