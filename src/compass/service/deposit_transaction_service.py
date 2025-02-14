@@ -20,9 +20,6 @@ class DepositTransactionService:
                 if deposits_count == 0: 
                     break
                 else:
-                    since = deposits[-1].updated_at
-                    total_count += deposits_count 
-
                     users_mapping = DepositTransactionService.get_users_mapping(deposits)
 
                     user_banks = UserBankAccountService.get_by_ids(list({deposit.user_bank_details_id for deposit in deposits}))
@@ -38,6 +35,9 @@ class DepositTransactionService:
 
                     transactions_compass = DepositTransactionService.convert_to_compass_format(deposits, users_mapping, deposit_banks_mapping, logins_mapping)
                     ReportService.write_report(report_name, transactions_compass)
+
+                    since = deposits[-1].updated_at
+                    total_count += deposits_count 
                 
             logger.info(f'generated total {total_count} deposit transaction details')            
         except Exception as exception:

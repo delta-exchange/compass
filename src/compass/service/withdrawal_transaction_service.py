@@ -20,9 +20,6 @@ class WithdrawalTransactionService:
                 if withdrawals_count == 0: 
                     break
                 else:
-                    since = withdrawals[-1].updated_at
-                    total_count += withdrawals_count
-
                     users_mapping = WithdrawalTransactionService.get_users_mapping(withdrawals)
                     
                     user_banks = UserBankAccountService.get_by_ids(list({withdrawal.user_bank_detail_id for withdrawal in withdrawals}))
@@ -30,6 +27,9 @@ class WithdrawalTransactionService:
                 
                     transactions_compass = WithdrawalTransactionService.convert_to_compass_format(withdrawals, users_mapping, withdrawal_banks_mapping)
                     ReportService.write_report(report_name, transactions_compass)
+
+                    since = withdrawals[-1].updated_at
+                    total_count += withdrawals_count
                 
             logger.info(f'generated withdrawal transaction details for {total_count}')            
         except Exception as exception:
