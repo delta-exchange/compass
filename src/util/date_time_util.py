@@ -5,17 +5,17 @@ class DateTimeUtil:
     @staticmethod
     def get_24hrs_ago():
         utc_24hrs_ago = datetime.now(timezone.utc) - timedelta(hours=24)
-        updated_since = utc_24hrs_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
+        updated_since = utc_24hrs_ago.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         return updated_since
     
     @staticmethod
     def get_now():
         now = datetime.now(timezone.utc)
-        return now.strftime('%Y-%m-%dT%H:%M:%SZ')
+        return now.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         
     @staticmethod
     def get_date_from_string(date_string):
-        return datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S.%fZ')
     
     @staticmethod
     def get_age_by_dob(dob):

@@ -27,7 +27,7 @@ class FillTransactionDetailsService:
                     products = ProductService.get_by_product_symbols(list({fill.product_symbol for fill in order_fills}))
                     products_mapping = {product.symbol: product for product in products}
 
-                    logins = LoginHistoryService.get_by_user_id_and_since([user_id for user_id in users_mapping], datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc) - timedelta(days=15))
+                    logins = LoginHistoryService.get_by_user_id_and_since([user_id for user_id in users_mapping], datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc) - timedelta(days=15))
                     logins_mapping = {}
                     for login in logins:
                         if not logins_mapping.get(login.user_id):
@@ -73,7 +73,7 @@ class FillTransactionDetailsService:
             counter_party_user_id = fill.counter_party_user_id
             counter_party_user = users_mapping.get(counter_party_user_id) if counter_party_user_id else None
             user_logins = logins_mapping.get(user.id, []) if user else []
-            login = next((login for login in user_logins[::-1] if login.created_at <= datetime.strptime(fill.created_at, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)), None)
+            login = next((login for login in user_logins[::-1] if login.created_at <= datetime.strptime(fill.created_at, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)), None)
             city, state, country = AddressUtil.get_city_state_country_by_login(login)
 
             transactions_compass.append({
