@@ -39,7 +39,7 @@ class AddressUtil:
             city_pattern = r'\b(' + '|'.join(city_list) + r')\b'
             city_match = re.search(city_pattern, address, re.IGNORECASE)
             city = city_match.group(0) if city_match else None
-        if not city:
+        if (not city) and pincode:
             city = AddressUtil.get_city_by_pincode_using_postal_api(pincode)
 
         return pincode, state, city
