@@ -12,8 +12,8 @@ class WithdrawalTransactionService:
             report_name = f"TRN{DateTimeUtil.get_current_date()}03"
             logger.info(f'generating withdrawal transaction details into {report_name}')
             total_count = 0
-            since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
-            to = datetime.strptime(to, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+            since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+            to = datetime.strptime(to, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             while True:
                 withdrawals = WithdrawalService.get_between(since, to, batch_size=500)
                 withdrawals_count = len(withdrawals)
