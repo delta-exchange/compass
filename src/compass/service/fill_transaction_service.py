@@ -14,6 +14,7 @@ class FillTransactionDetailsService:
             logger.info(f'generating transaction details into {report_name}')
             total_count = 0
             while True:
+                logger.info(f"From: {from_time}")
                 order_fills = FillsService.get_between(from_time, to, batch_size=500)
                 order_fills_count = len(order_fills)
                 if len(order_fills) == 0: 

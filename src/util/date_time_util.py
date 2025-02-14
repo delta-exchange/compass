@@ -3,8 +3,8 @@ from datetime import datetime, timedelta, timezone
 class DateTimeUtil:
     
     @staticmethod
-    def get_24hrs_ago():
-        utc_24hrs_ago = datetime.now(timezone.utc) - timedelta(hours=24)
+    def get_90days_ago():
+        utc_24hrs_ago = datetime.now(timezone.utc) - timedelta(days=90)
         updated_since = utc_24hrs_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
         return updated_since
     

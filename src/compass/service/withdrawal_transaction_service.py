@@ -15,14 +15,12 @@ class WithdrawalTransactionService:
             since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
             to = datetime.strptime(to, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
             while True:
+                logger.info(f"From: {since}")
                 withdrawals = WithdrawalService.get_between(since, to, batch_size=500)
                 withdrawals_count = len(withdrawals)
                 if withdrawals_count == 0: 
                     break
                 else:
-                    since = withdrawals[-1].updated_at
-                    total_count += withdrawals_count
-
                     users_mapping = WithdrawalTransactionService.get_users_mapping(withdrawals)
                     
                     user_banks = UserBankAccountService.get_by_ids(list({withdrawal.user_bank_detail_id for withdrawal in withdrawals}))
@@ -30,6 +28,9 @@ class WithdrawalTransactionService:
                 
                     transactions_compass = WithdrawalTransactionService.convert_to_compass_format(withdrawals, users_mapping, withdrawal_banks_mapping)
                     ReportService.write_report(report_name, transactions_compass)
+
+                    since = withdrawals[-1].updated_at
+                    total_count += withdrawals_count
                 
             logger.info(f'generated withdrawal transaction details for {total_count}')            
         except Exception as exception:
