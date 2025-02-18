@@ -13,6 +13,7 @@ class LinkedAccountDetailsService:
             logger.info(f'generating linked account details')
             total_count = 0
             while True:
+                logger.info(f"From: {from_time}")
                 report_name = f"LAD{current_date}" + get_report_index(total_count, 100000)
                 user_bank_accounts = UserBankAccountService.get_between(from_time, to, batch_size=10000)
                 user_bank_accounts_count = len(user_bank_accounts)

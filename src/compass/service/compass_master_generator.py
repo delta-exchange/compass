@@ -35,8 +35,8 @@ class CompassMasterGenerator:
             CustomerDetailsService.generate_customer_details_details(master_from_time, now)
             
             DepositTransactionService.generate_transaction_details(txn_master_from_date, now)
-            FillTransactionDetailsService.generate_transaction_details(txn_master_from_date, now)
             WithdrawalTransactionService.generate_transaction_details(txn_master_from_date, now)
+            FillTransactionDetailsService.generate_transaction_details(txn_master_from_date, now)
 
             SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
             SlackNotifier.send_alert('Compass cron(Master dump)\n```status: Success\n```')

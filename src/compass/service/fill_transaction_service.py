@@ -16,7 +16,8 @@ class FillTransactionDetailsService:
             since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             to = datetime.strptime(to, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             while True:
-                order_fills = FillsService.get_between(since, to, batch_size=500)
+                logger.info(f"From: {since}")
+                order_fills = FillsService.get_between(since, to, batch_size=10000)
                 order_fills_count = len(order_fills)
                 if order_fills_count == 0: 
                     break

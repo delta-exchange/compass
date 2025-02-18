@@ -15,7 +15,8 @@ class WithdrawalTransactionService:
             since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             to = datetime.strptime(to, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             while True:
-                withdrawals = WithdrawalService.get_between(since, to, batch_size=500)
+                logger.info(f"From: {since}")
+                withdrawals = WithdrawalService.get_between(since, to, batch_size=10000)
                 withdrawals_count = len(withdrawals)
                 if withdrawals_count == 0: 
                     break

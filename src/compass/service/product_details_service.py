@@ -10,6 +10,7 @@ class ProductDetailsService:
         logger.info(f'generating product details')
         total_count = 0
         while True:
+            logger.info(f"From: {from_time}")
             report_name = f"PRD{current_date}" + get_report_index(total_count, 100000)
             products = ProductService.get_between(from_time, to_time, batch_size=10000)
             products_count = len(products)

@@ -15,7 +15,8 @@ class DepositTransactionService:
             since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             to = datetime.strptime(to, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             while True:
-                deposits = DepositService.get_between(since, to, batch_size=500)
+                logger.info(f"From: {since}")
+                deposits = DepositService.get_between(since, to, batch_size=10000)
                 deposits_count = len(deposits)
                 if deposits_count == 0: 
                     break
