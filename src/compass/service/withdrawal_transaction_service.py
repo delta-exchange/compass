@@ -9,7 +9,7 @@ class WithdrawalTransactionService:
     @staticmethod
     def generate_transaction_details(from_time, to):
         try:
-            report_name = f"TRN{DateTimeUtil.get_current_date()}03"
+            report_name = f"TRN{DateTimeUtil.get_current_date()}04"
             logger.info(f'generating withdrawal transaction details into {report_name}')
             total_count = 0
             since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
