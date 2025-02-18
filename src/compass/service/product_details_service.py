@@ -1,15 +1,16 @@
 from src.database.service import ProductService
 from .report_service import ReportService
-from src.util import logger, DateTimeUtil
+from src.util import logger, DateTimeUtil, get_report_index
 
 class ProductDetailsService:
 
     @staticmethod
     def generate_product_details(from_time, to_time):
-        report_name = f"PRD{DateTimeUtil.get_current_date()}01"
-        logger.info(f'generating products products into {report_name}')
+        current_date = DateTimeUtil.get_current_date()
+        logger.info(f'generating product details')
         total_count = 0
         while True:
+            report_name = f"PRD{current_date}" + get_report_index(total_count, 100000)
             products = ProductService.get_between(from_time, to_time, batch_size=10000)
             products_count = len(products)
             if products_count == 0: 

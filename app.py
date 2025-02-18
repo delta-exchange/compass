@@ -7,7 +7,7 @@ from src.compass.service import CompassGenerator
 load_dotenv(find_dotenv(), override=True)
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(CompassGenerator.start, CronTrigger(hour="13", minute="51"))
+scheduler.add_job(CompassGenerator.start, CronTrigger(hour="5", minute="37"))
 scheduler.start()
 
 app = Flask(__name__)

@@ -1,6 +1,6 @@
 from src.database.engine import IamEngine
 from src.database.model import KycDocumentModel
-from src.util import Encrpytion
+from .iam_service import IAMService
 
 class KycDocumentsService:
     
@@ -8,32 +8,20 @@ class KycDocumentsService:
     def get_by_user_ids(user_ids):
         session = IamEngine.get_session()
         kyc_list = session.query(KycDocumentModel).filter(KycDocumentModel.user_id.in_(user_ids)).order_by(KycDocumentModel.created_at).all()
+
+        encrypted_data = [{"value": kyc.document_value, "vector": kyc.vector} for kyc in kyc_list if kyc.document_value and kyc.vector]
+        encrypted_data = encrypted_data + [{"value": kyc.address.get('value'), "vector": kyc.address.get('vector')} for kyc in kyc_list if kyc.document_type == 1 and kyc.address and kyc.address.get('value') and kyc.address.get('vector')]
+        decrypted_data = IAMService.get_decrypted_data(encrypted_data)
+
+        decrypted_data_mapping = {data.value: data.decrypted_value for data in decrypted_data}
+
         user_kyc_details = {}
         for kyc in kyc_list:
-            user_kyc_details[kyc.user_id] = {} if kyc.user_id not in user_kyc_details else user_kyc_details[kyc.user_id]
-            kyc_data = KycDocumentsService.__decrypt(kyc) 
-            pan_number, aadhaar_number, address = kyc_data.get("pan_number"), kyc_data.get("aadhaar_number"), kyc_data.get("address")
-            if pan_number:
-                user_kyc_details[kyc.user_id]["pan_number"] = pan_number
-            if aadhaar_number:
-                user_kyc_details[kyc.user_id]["aadhaar_number"] = aadhaar_number
-            if address:
-                user_kyc_details[kyc.user_id]["address"] = address
+            if kyc.vector and kyc.document_value:
+                if kyc.document_type == 0:
+                    user_kyc_details[kyc.user_id]["pan_number"] = decrypted_data_mapping.get(kyc.document_value)
+                else:
+                    user_kyc_details[kyc.user_id]["aadhaar_number"] = decrypted_data_mapping.get(kyc.document_value)
+                    if kyc.address and kyc.address.get('value') and kyc.address.get('vector'):
+                        user_kyc_details[kyc.user_id]["address"] = decrypted_data_mapping.get(kyc.address.get('value'))
         return user_kyc_details
-    
-    @staticmethod
-    def __decrypt(kyc):
-        if kyc.document_type == 0: # pan
-            pan_vector, pan_cipher = kyc.vector, kyc.document_value
-            pan = Encrpytion.decrypt_kyc_data(pan_vector, pan_cipher)
-            return {"pan_number": pan}
-        else: # aadhaar
-            aadhaar_vector, aadhaar_cipher = kyc.vector, kyc.document_value
-            aadhaar = Encrpytion.decrypt_kyc_data(aadhaar_vector, aadhaar_cipher)
-            address = kyc.address
-            if address:
-                address_vector, address_cipher = kyc.address.get('vector'), kyc.address.get('value')
-                address = Encrpytion.decrypt_kyc_data(address_vector, address_cipher)
-            return {"aadhaar_number": aadhaar, "address": address}
-        
-        

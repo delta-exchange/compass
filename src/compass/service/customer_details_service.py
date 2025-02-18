@@ -1,6 +1,6 @@
 from src.database.service import UserDetailsService, KycDocumentsService, LoginHistoryService
 from .report_service import ReportService
-from src.util import logger, DateTimeUtil, AddressUtil
+from src.util import logger, DateTimeUtil, AddressUtil, get_report_index
 
 import traceback
 
@@ -10,10 +10,11 @@ class CustomerDetailsService:
     def generate_customer_details_details(from_time, to):
         try:
             login_city_list = CustomerDetailsService.get_login_city_list()
-            report_name = f"CST{DateTimeUtil.get_current_date()}01"
-            logger.info(f'generating customer details into {report_name}')
+            current_date = DateTimeUtil.get_current_date()
+            logger.info(f'generating customer details')
             total_count = 0
             while True:
+                report_name = f"CST{current_date}" + get_report_index(total_count, 100000)
                 users = UserDetailsService.get_between(from_time, to, batch_size=500)
                 users_count = len(users)
                 if users_count == 0: 

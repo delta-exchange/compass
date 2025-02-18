@@ -1,6 +1,6 @@
 from src.database.service import UserBankAccountService
 from .report_service import ReportService
-from src.util import logger, DateTimeUtil
+from src.util import logger, DateTimeUtil, get_report_index
 
 import traceback
 
@@ -9,10 +9,11 @@ class LinkedAccountDetailsService:
     @staticmethod
     def generate_linked_account_details(from_time, to):
         try:
-            report_name = f"LAD{DateTimeUtil.get_current_date()}01"
-            logger.info(f'generating linked account details into {report_name}')
+            current_date = DateTimeUtil.get_current_date()
+            logger.info(f'generating linked account details')
             total_count = 0
             while True:
+                report_name = f"LAD{current_date}" + get_report_index(total_count, 100000)
                 user_bank_accounts = UserBankAccountService.get_between(from_time, to, batch_size=10000)
                 user_bank_accounts_count = len(user_bank_accounts)
                 if user_bank_accounts_count == 0: 
