@@ -26,6 +26,7 @@ class CustomerDetailsService:
                     users_mapping = CustomerDetailsService.get_users_mapping(users)
                     user_kyc_details_mapping = KycDocumentsService.get_by_user_ids(list({user.id for user in users_mapping.values() if user.is_kyc_done}))
                     ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping, login_city_list))
+                break
                 
             logger.info(f'generated customer details for {total_count} users')
         except Exception as exception:
