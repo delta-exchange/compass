@@ -28,3 +28,15 @@ class DateTimeUtil:
     @staticmethod
     def get_current_date():
         return datetime.now(timezone.utc).strftime('%d%m%Y')
+    
+    @staticmethod
+    def get_master_date():
+        utc_24hrs_ago = datetime.now(timezone.utc) - timedelta(days = 1000)
+        updated_since = utc_24hrs_ago.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        return updated_since
+    
+    @staticmethod
+    def get_txn_master_date():
+        utc_24hrs_ago = datetime.now(timezone.utc) - timedelta(days = 90)
+        updated_since = utc_24hrs_ago.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        return updated_since

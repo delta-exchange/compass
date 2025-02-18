@@ -8,3 +8,4 @@ from .customer_last_transaction_details_service import CustomerLastTransactionDe
 from .fill_transaction_service import FillTransactionDetailsService
 from .compass_generator import CompassGenerator
 from .product_details_service import ProductDetailsService
+from .compass_master_generator import CompassMasterGenerator
