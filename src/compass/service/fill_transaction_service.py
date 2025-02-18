@@ -13,10 +13,12 @@ class FillTransactionDetailsService:
             report_name = f"TRN{DateTimeUtil.get_current_date()}01"
             logger.info(f'generating transaction details into {report_name}')
             total_count = 0
+            since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+            to = datetime.strptime(to, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
             while True:
-                order_fills = FillsService.get_between(from_time, to, batch_size=500)
+                order_fills = FillsService.get_between(since, to, batch_size=500)
                 order_fills_count = len(order_fills)
-                if len(order_fills) == 0: 
+                if order_fills_count == 0: 
                     break
                 else:
                     users_mapping = FillTransactionDetailsService.get_users_mapping(order_fills)
@@ -27,7 +29,7 @@ class FillTransactionDetailsService:
                     products = ProductService.get_by_product_symbols(list({fill.product_symbol for fill in order_fills}))
                     products_mapping = {product.symbol: product for product in products}
 
-                    logins = LoginHistoryService.get_by_user_id_and_since([user_id for user_id in users_mapping], datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc) - timedelta(days=15))
+                    logins = LoginHistoryService.get_by_user_id_and_since([user_id for user_id in users_mapping], since - timedelta(days=15))
                     logins_mapping = {}
                     for login in logins:
                         if not logins_mapping.get(login.user_id):
@@ -38,7 +40,7 @@ class FillTransactionDetailsService:
                     transactions_compass = FillTransactionDetailsService.convert_to_compass_format(order_fills, users_mapping, user_banks_mapping, products_mapping, logins_mapping)
                     ReportService.write_report(report_name, transactions_compass)
 
-                    from_time = order_fills[-1].created_at
+                    since = order_fills[-1].created_at
                     total_count += order_fills_count
                 
             logger.info(f'generated totoal {total_count} transaction details')            
@@ -73,7 +75,7 @@ class FillTransactionDetailsService:
             counter_party_user_id = fill.counter_party_user_id
             counter_party_user = users_mapping.get(counter_party_user_id) if counter_party_user_id else None
             user_logins = logins_mapping.get(user.id, []) if user else []
-            login = next((login for login in user_logins[::-1] if login.created_at <= datetime.strptime(fill.created_at, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)), None)
+            login = next((login for login in user_logins[::-1] if login.created_at <= fill.created_at), None)
             city, state, country = AddressUtil.get_city_state_country_by_login(login)
 
             transactions_compass.append({
