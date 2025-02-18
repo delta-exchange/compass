@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-file_handler = logging.FileHandler('app.log') 
+file_handler = logging.FileHandler('app1.log') 
 console_handler = logging.StreamHandler()    
 
 file_handler.setLevel(logging.DEBUG)

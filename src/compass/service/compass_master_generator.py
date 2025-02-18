@@ -23,23 +23,11 @@ class CompassMasterGenerator:
         try:
             master_from_time, now, txn_master_from_date = DateTimeUtil.get_master_date(), DateTimeUtil.get_now(), DateTimeUtil.get_txn_master_date()
             reports_directory = os.path.join(os.getcwd(), 'reports', f"{DateTimeUtil.get_current_date()}")
-            logger.info(f'cleaning up reports for directory : {reports_directory}')
-            if os.path.exists(reports_directory): shutil.rmtree(reports_directory)
-            os.makedirs(reports_directory)
-
-            ExchangeDetailsService.generate_exchange_details()
-
-            ProductDetailsService.generate_product_details(master_from_time, now)
-
-            LinkedAccountDetailsService.generate_linked_account_details(master_from_time, now)
+            if not os.path.exists(reports_directory): 
+                os.makedirs(reports_directory)
+            
             CustomerDetailsService.generate_customer_details_details(master_from_time, now)
             
-            DepositTransactionService.generate_transaction_details(txn_master_from_date, now)
-            FillTransactionDetailsService.generate_transaction_details(txn_master_from_date, now)
-            WithdrawalTransactionService.generate_transaction_details(txn_master_from_date, now)
-
-            SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
-            SlackNotifier.send_alert('Compass cron(Master dump)\n```status: Success\n```')
         except:
             exception_message = traceback.format_exc()
             logger.error(f'An error occurred while generating reports: {exception_message}')
