@@ -13,7 +13,12 @@ class SCPTransfer:
         remote_host = os.getenv("COMPASS_HOST")
         username = os.getenv("COMPASS_USER")
         password = os.getenv("COMPASS_PASSWORD")
-        ssh.connect(remote_host, username=username, password=password)
+        ssh_key = os.getenv("COMPASS_SSH_KEY")
+
+        if ssh_key:
+            ssh.connect(remote_host, username=username, key_filename=ssh_key)
+        else:
+            ssh.connect(remote_host, username=username, password=password)
 
         scp = SCPClient(ssh.get_transport())
         for file in os.listdir(directory):
