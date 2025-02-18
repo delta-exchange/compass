@@ -98,7 +98,7 @@ class CustomerDetailsService:
                 'VoterIdentityCardNo': None,
                 'IdentityNo': kyc.get('aadhaar_number'),
                 'TAX ID': None,
-                'Annual Income': main_user.income if main_user else None,
+                'Annual Income': None,
                 'Income From Business': None,
                 'Other Income': None,
                 'Net Worth': None,
@@ -220,5 +220,6 @@ class CustomerDetailsService:
                 'CUSTOMERONBOARDING_COUNTRY': main_user.country if main_user else None,
                 'CUSTOMERONBOARDING_GEOLOCATION': None,
                 'CUSTOMER_FAMILYCODE/CUSTOMER_GROUPCODE': None,
+                'Annual Income Range': main_user.income if main_user else None,
             })
         return users_compass
