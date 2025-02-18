@@ -28,7 +28,7 @@ class AddressUtil:
         state = state_match.group(0) if state_match else None
 
         city = None
-        if not state:
+        if state:
             index = address.lower().find(state.lower())
             if index != -1:
                 address_before_state = address[:index]
