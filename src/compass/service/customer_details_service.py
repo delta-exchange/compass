@@ -113,7 +113,7 @@ class CustomerDetailsService:
                 'RM Name': None,
                 'RM Mobile': None,
                 'Authorized  Capital': None,
-                'Phone Details': f'{main_user.country_calling_code} {main_user.phone_number}' if (main_user and main_user.country_calling_code and main_user.phone_number) else None,
+                'Phone Details': main_user.phone_number if main_user else None,
                 'PEP Flag': None,
                 'NPO Flag': None,
                 'HNI Flag': None,
