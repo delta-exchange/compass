@@ -8,9 +8,7 @@ import os
 load_dotenv(find_dotenv(), override=True)
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(CompassGenerator.start, CronTrigger(hour="5", minute="37"))
-if os.getenv("MASTER_DUMP_CRON_ENABLED"):
-    scheduler.add_job(CompassMasterGenerator.start, CronTrigger(hour="5", minute="37"))
+scheduler.add_job(CompassMasterGenerator.start, CronTrigger(year=2025, month=2, day=19, hour=10, minute=54))
 scheduler.start()
 
 app = Flask(__name__)

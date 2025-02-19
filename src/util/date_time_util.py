@@ -37,6 +37,4 @@ class DateTimeUtil:
     
     @staticmethod
     def get_txn_master_date():
-        utc_24hrs_ago = datetime.now(timezone.utc) - timedelta(days = 90)
-        updated_since = utc_24hrs_ago.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        return updated_since
+        return "2025-01-21T11:40:08.139118Z"

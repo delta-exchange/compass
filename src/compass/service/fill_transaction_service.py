@@ -10,7 +10,7 @@ class FillTransactionDetailsService:
     @staticmethod
     def generate_transaction_details(from_time, to):
         try:
-            report_name = f"TRN{DateTimeUtil.get_current_date()}01"
+            report_name = f"TRN{18022025}05"
             logger.info(f'generating transaction details into {report_name}')
             total_count = 0
             since = datetime.strptime(from_time, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
