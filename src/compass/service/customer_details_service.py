@@ -16,7 +16,7 @@ class CustomerDetailsService:
             while True:
                 logger.info(f"From: {from_time}")
                 report_name = f"CST{current_date}" + get_report_index(total_count, 100000)
-                users = UserDetailsService.get_between(from_time, to, batch_size=10000)
+                users = UserDetailsService.get_between(from_time, to, batch_size=500)
                 users_count = len(users)
                 if users_count == 0: 
                     break
