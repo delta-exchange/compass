@@ -20,9 +20,9 @@ class CompassMasterGenerator:
 
     @staticmethod
     def start():
-            products = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'products.txt'))
-            logger.info(f"picked up {len(products)} missing products")
-            ProductDetailsService.generate_product_details(products)
+            # products = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'products.txt'))
+            # logger.info(f"picked up {len(products)} missing products")
+            # ProductDetailsService.generate_product_details(products)
 
             customers = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'customers.txt'))
             logger.info(f"picked up {len(customers)} missing customers")
@@ -31,5 +31,5 @@ class CompassMasterGenerator:
     @staticmethod
     def get_list_from_file(file):
         with open(file, "r") as f:
-            return [line.strip() for line in f]
+            return list({line.strip() for line in f})
           

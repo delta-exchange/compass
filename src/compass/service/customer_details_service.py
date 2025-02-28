@@ -16,6 +16,7 @@ class CustomerDetailsService:
             while True:
                 batch = customer_ids[(batch_no-1)*batch_size:batch_no*batch_size]
                 users = UserDetailsService.get_by_user_ids(batch)
+                logger.info(f"Asked {len(batch)} users Got {len(users)} users from db")
                 if not batch:
                     break
                 users_mapping = CustomerDetailsService.get_users_mapping(users)
