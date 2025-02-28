@@ -14,7 +14,7 @@ class CustomerLoginDetailsService:
             total_count = 0
             while True:
                 report_name = f"CLD{current_date}" + get_report_index(total_count, 100000)
-                login_histories = LoginHistoryService.get_between(from_time, to, batch_size=500)
+                login_histories = LoginHistoryService.get_between(from_time, to, batch_size=10000)
                 login_histories_count = len(login_histories)
                 if login_histories_count == 0: 
                     break
