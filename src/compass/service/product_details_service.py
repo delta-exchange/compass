@@ -5,24 +5,20 @@ from src.util import logger, DateTimeUtil, get_report_index
 class ProductDetailsService:
 
     @staticmethod
-    def generate_product_details(from_time, to_time):
-        current_date = DateTimeUtil.get_current_date()
+    def generate_product_details(product_ids):
+        report_name = f"PRD18022025XX"
+        batch_no, batch_size, total_count = 1, 1000, 0
         logger.info(f'generating product details')
-        total_count = 0
         while True:
-            logger.info(f"From: {from_time}")
-            report_name = f"PRD{current_date}" + get_report_index(total_count, 100000)
-            products = ProductService.get_between(from_time, to_time, batch_size=10000)
-            products_count = len(products)
-            if products_count == 0: 
+            batch = product_ids[(batch_no-1)*batch_size:batch_no*batch_size]
+            if not batch:
                 break
-            else:
-                from_time = products[-1].updated_at
-                total_count += len(products)
-                
-                products_compass = ProductDetailsService.convert_to_compass_format(products)
-                ReportService.write_report(report_name, products_compass)
-                
+            products = ProductService.get_by_product_ids(batch)
+            products_compass = ProductDetailsService.convert_to_compass_format(products)
+            ReportService.write_report(report_name, products_compass)
+            total_count += len(products)
+            batch_no += 1
+    
         logger.info(f'generated total {total_count} product details')
 
     @staticmethod

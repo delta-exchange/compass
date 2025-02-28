@@ -7,26 +7,22 @@ import traceback
 class CustomerDetailsService:
 
     @staticmethod
-    def generate_customer_details_details(from_time, to):
+    def generate_customer_details_details(customer_ids):
         try:
             login_city_list = CustomerDetailsService.get_login_city_list()
-            current_date = DateTimeUtil.get_current_date()
             logger.info(f'generating customer details')
-            total_count = 0
+            batch_no, batch_size, total_count = 1, 1000, 0
+            report_name = f"CST{18022025}XX"
             while True:
-                logger.info(f"From: {from_time}")
-                report_name = f"CST{current_date}" + get_report_index(total_count, 100000)
-                users = UserDetailsService.get_between(from_time, to, batch_size=500)
-                users_count = len(users)
-                if users_count == 0: 
+                batch = customer_ids[(batch_no-1)*batch_size:batch_no*batch_size]
+                users = UserDetailsService.get_by_user_ids(batch)
+                if not batch:
                     break
-                else:
-                    from_time = users[-1].updated_at
-                    total_count += len(users)
-
-                    users_mapping = CustomerDetailsService.get_users_mapping(users)
-                    user_kyc_details_mapping = KycDocumentsService.get_by_user_ids(list({user.id for user in users_mapping.values() if user.is_kyc_done}))
-                    ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping, login_city_list))
+                users_mapping = CustomerDetailsService.get_users_mapping(users)
+                user_kyc_details_mapping = KycDocumentsService.get_by_user_ids(list({user.id for user in users_mapping.values() if user.is_kyc_done}))
+                ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping, login_city_list))
+                total_count += len(batch)
+                batch_no += 1
                 
             logger.info(f'generated customer details for {total_count} users')
         except Exception as exception:

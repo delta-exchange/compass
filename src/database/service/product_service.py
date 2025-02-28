@@ -14,3 +14,9 @@ class ProductService:
         session = LedgerEngine.get_session()
         products = session.query(ProductModel).filter(ProductModel.symbol.in_(product_symbols)).all()
         return products
+    
+    @staticmethod
+    def get_by_product_ids(product_ids):
+        session = LedgerEngine.get_session()
+        products = session.query(ProductModel).filter(ProductModel.id.in_(product_ids)).all()
+        return products
