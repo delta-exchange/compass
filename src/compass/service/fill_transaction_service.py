@@ -93,7 +93,7 @@ class FillTransactionDetailsService:
                 'CALLORPUTTYPE': product.contract_type if product else None,
                 'STRIKEPRICE': product.strike_price if product else None,
                 'EXPIRYDATE': product.settlement_time if product else None,
-                'TRANSACTIONINDICATOR': None,
+                'TRANSACTIONINDICATOR': 'BUY' if fill.side == 0 else 'SELL',
                 'CUSTOMERID': fill.user_id,
                 'ACCOUNTNO': user_bank.account_number if user_bank else None,
                 'CUSTOMERNAME': f'{user.first_name} {user.last_name}' if user else None,
