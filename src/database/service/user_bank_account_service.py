@@ -21,3 +21,9 @@ class UserBankAccountService:
         session = WalletEngine.get_session()
         user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.id.in_(ids)).all()
         return user_bank_accounts
+    
+    @staticmethod
+    def get_by_account_nos(account_nos):
+        session = WalletEngine.get_session()
+        user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.account_number.in_(account_nos)).all()
+        return user_bank_accounts

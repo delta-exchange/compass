@@ -24,9 +24,13 @@ class CompassMasterGenerator:
             # logger.info(f"picked up {len(products)} missing products")
             # ProductDetailsService.generate_product_details(products)
 
-            customers = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'customers.txt'))
-            logger.info(f"picked up {len(customers)} missing customers")
-            CustomerDetailsService.generate_customer_details_details(customers)
+            # customers = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'customers.txt'))
+            # logger.info(f"picked up {len(customers)} missing customers")
+            # CustomerDetailsService.generate_customer_details_details(customers)
+
+            linked_accounts = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'linkedaccounts.txt'))
+            logger.info(f"picked up {len(linked_accounts)} missing linked accounts")
+            LinkedAccountDetailsService.generate_linked_account_details(linked_accounts)
 
     @staticmethod
     def get_list_from_file(file):

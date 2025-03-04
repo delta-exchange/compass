@@ -7,23 +7,19 @@ import traceback
 class LinkedAccountDetailsService:
 
     @staticmethod
-    def generate_linked_account_details(from_time, to):
+    def generate_linked_account_details(account_nos):
         try:
-            current_date = DateTimeUtil.get_current_date()
+            report_name = f"LAD18022025XX"
             logger.info(f'generating linked account details')
-            total_count = 0
+            total_count, batch, batch_size = 0, 1, 1000
             while True:
-                logger.info(f"From: {from_time}")
-                report_name = f"LAD{current_date}" + get_report_index(total_count, 100000)
-                user_bank_accounts = UserBankAccountService.get_between(from_time, to, batch_size=10000)
-                user_bank_accounts_count = len(user_bank_accounts)
-                if user_bank_accounts_count == 0: 
+                accounts_batch = account_nos[(batch-1)*batch_size:batch*batch_size]
+                if not accounts_batch:
                     break
-                else:
-                    from_time = user_bank_accounts[-1].updated_at
-                    total_count += user_bank_accounts_count
-                    
-                    ReportService.write_report(report_name, LinkedAccountDetailsService.convert_to_compass_format(user_bank_accounts))
+                user_bank_accounts = UserBankAccountService.get_by_account_nos(accounts_batch)
+                ReportService.write_report(report_name, LinkedAccountDetailsService.convert_to_compass_format(user_bank_accounts))
+                total_count += len(user_bank_accounts)
+                batch += 1
                 
             logger.info(f'generated total: {total_count} linked account details')
         except Exception as exception:
