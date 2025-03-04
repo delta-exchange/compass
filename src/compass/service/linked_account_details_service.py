@@ -9,7 +9,7 @@ class LinkedAccountDetailsService:
     @staticmethod
     def generate_linked_account_details(account_nos):
         try:
-            report_name = f"LAD18022025XX"
+            report_name = f"LAD18022025XY"
             logger.info(f'generating linked account details')
             total_count, batch, batch_size = 0, 1, 1000
             while True:
