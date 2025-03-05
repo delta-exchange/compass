@@ -16,6 +16,8 @@ from .order_transaction_service import OrderTransactionDetailsService
 from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 import json
+import os
+import csv
 class CompassMasterGenerator:
 
     @staticmethod
@@ -28,12 +30,30 @@ class CompassMasterGenerator:
             # logger.info(f"picked up {len(customers)} missing customers")
             # CustomerDetailsService.generate_customer_details_details(customers)
 
-            linked_accounts = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'linkedaccounts.txt'))
-            logger.info(f"picked up {len(linked_accounts)} missing linked accounts")
-            LinkedAccountDetailsService.generate_linked_account_details(linked_accounts)
+            # linked_accounts = CompassMasterGenerator.get_list_from_file(os.path.join(os.getcwd(), 'missing', 'linkedaccounts.txt'))
+            # logger.info(f"picked up {len(linked_accounts)} missing linked accounts")
+            # LinkedAccountDetailsService.generate_linked_account_details(linked_accounts)
+            
+            customer_report_directory = os.path.join(os.getcwd(), 'reports', '18022025')
+            files = CompassMasterGenerator.get_all_files(customer_report_directory)
+            for file in files:
+                logger.info(f"picked up {file} for parent account id generation")
+                user_ids = CompassMasterGenerator.get_user_ids_from_file(os.path.join(os.getcwd(), 'reports', '18022025', file))
+                CustomerDetailsService.generate_customer_details_details(user_ids)
+    
+    @staticmethod
+    def get_all_files(directory):
+        files = [f for f in os.listdir(directory) if f.startswith('CST') and os.path.isfile(os.path.join(directory, f))]
+        return files
+
 
     @staticmethod
-    def get_list_from_file(file):
-        with open(file, "r") as f:
-            return list({line.strip() for line in f})
-          
+    def get_user_ids_from_file(file):
+        user_ids = set()
+        with open(file, newline='', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile, delimiter='|')
+            next(reader)  
+            for row in reader:
+                if row:  
+                    user_ids.add(row[0])
+        return list(user_ids)
