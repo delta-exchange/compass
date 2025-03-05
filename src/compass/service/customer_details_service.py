@@ -220,7 +220,7 @@ class CustomerDetailsService:
                 'CUSTOMERONBOARDING_PINCODE': pincode,
                 'CUSTOMERONBOARDING_COUNTRY': main_user.country if main_user else None,
                 'CUSTOMERONBOARDING_GEOLOCATION': None,
-                'CUSTOMER_FAMILYCODE/CUSTOMER_GROUPCODE': None,
+                'CUSTOMER_FAMILYCODE/CUSTOMER_GROUPCODE': main_user.id if main_user else None,
                 'Annual Income Range': main_user.income if main_user else None,
             })
         return users_compass
