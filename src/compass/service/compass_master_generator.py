@@ -14,6 +14,7 @@ from .withdrawal_transaction_service import WithdrawalTransactionService
 from .product_details_service import ProductDetailsService
 from .order_transaction_service import OrderTransactionDetailsService
 from src.vendor import SlackNotifier, SCPTransfer
+from .kyc_rejection_details_service import KycRejectionDetailsService
 import traceback
 import json
 class CompassMasterGenerator:
@@ -22,11 +23,11 @@ class CompassMasterGenerator:
     def start():
         try:
             master_from_time, now, txn_master_from_date = DateTimeUtil.get_master_date(), DateTimeUtil.get_now(), DateTimeUtil.get_txn_master_date()
-            reports_directory = os.path.join(os.getcwd(), 'reports', f"{DateTimeUtil.get_current_date()}")
+            reports_directory = os.path.join(os.getcwd(), 'reports', f"{18022025}")
             if not os.path.exists(reports_directory): 
                 os.makedirs(reports_directory)
             
-            CustomerDetailsService.generate_customer_details_details(master_from_time, now)
+            KycRejectionDetailsService.generate_rejected_kyc_details(master_from_time, now)
             
         except:
             exception_message = traceback.format_exc()

@@ -6,12 +6,11 @@ class KycRejectionDetailsService:
 
     @staticmethod
     def generate_rejected_kyc_details(from_time, to_time):
-        current_date = DateTimeUtil.get_current_date()
         logger.info(f'generating rejected kyc details')
         total_count = 0
         while True:
             logger.info(f"From: {from_time}")
-            report_name = f"KRD{current_date}" + get_report_index(total_count, 100000)
+            report_name = f"KRD18022025" + get_report_index(total_count, 100000)
             rejections = KycDocumentsService.get_rejected_kycs_between(from_time, to_time, 10000)
             rejections = KycRejectionDetailsService.get_latest_rejections(rejections)
             rejections_count = len(rejections)
