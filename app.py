@@ -9,7 +9,7 @@ from datetime import datetime
 load_dotenv(find_dotenv(), override=True)
 
 scheduler = BackgroundScheduler()
-target_date = datetime(2025, 3, 5, 14, 49)
+target_date = datetime(2025, 3, 6, 15, 23)
 scheduler.add_job(CompassMasterGenerator.start, CronTrigger(year=target_date.year, month=target_date.month, day=target_date.day, hour=target_date.hour, minute=target_date.minute, second=target_date.second))
 scheduler.start()
 
