@@ -274,5 +274,13 @@
         "TRANSACTIONPROCESSED_COUNTRY",
         "TRANSACTIONPROCESSED_GEOLOCATION",
         "TRANSACTION_IDENTIFIER"
+    ],
+    "KRD": [
+        "Customer ID",
+        "Vendor",
+        "Remarks",
+        "Total Rejections",
+        "Last Rejection Date",
+        "First Rejection Date"
     ]
 }
