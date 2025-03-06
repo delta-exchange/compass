@@ -7,3 +7,4 @@ from .product_model import ProductModel
 from .kyc_document_model import KycDocumentModel
 from .deposit_model import DepositModel
 from .withdrawal_model import WithdrawalModel
+from .kyc_status_log_model import KycStatusLogModel
