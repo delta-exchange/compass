@@ -21,7 +21,11 @@ class KycRejectionDetailsService:
                 from_time = rejections[-1].updated_at
                 user_ids = [rejection.user_id for rejection in rejections]
                 rejection_stats = KycDocumentsService.get_rejection_stats_by_user_before(user_ids, from_time)
-                rejection_stats_mapping = {stat[0]: {"count": stat[1], "first_date": stat[2]} for stat in rejection_stats}
+                rejection_stats_mapping = {}
+                for stat in rejection_stats:
+                    user_id, remark, count, first_date = stat
+                    rejection_stats_mapping[f"{user_id}${remark}"] = {"count": count, "first_date": first_date}
+
                 total_count += rejections_count
                 
                 kyc_rejections_compass = KycRejectionDetailsService.convert_to_compass_format(rejections, rejection_stats_mapping)
@@ -33,7 +37,7 @@ class KycRejectionDetailsService:
     def get_latest_rejections(rejections):
         user_ids_mapping = {}
         for rejection in rejections:
-            user_ids_mapping[rejection.user_id] = rejection
+            user_ids_mapping[f"{rejection.user_id}${rejection.remark}"] = rejection
         return list(user_ids_mapping.values())
 
 
@@ -41,7 +45,7 @@ class KycRejectionDetailsService:
     def convert_to_compass_format(kyc_rejections, rejection_stats_mapping):
         compass_list = []
         for rejection in kyc_rejections:
-            rejection_stat = rejection_stats_mapping.get(rejection.user_id, {})
+            rejection_stat = rejection_stats_mapping.get(f"{rejection.user_id}${rejection.remark}", {})
             compass_list.append({
                 "Customer ID": rejection.user_id,
                 "Vendor": rejection.vendor,

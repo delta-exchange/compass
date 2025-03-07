@@ -37,4 +37,18 @@ class KycDocumentsService:
     @staticmethod
     def get_rejection_stats_by_user_before(user_ids, date):
         session = IamEngine.get_session()
-        return session.query(KycStatusLogModel.user_id, func.count().label("rejection_count"), func.min(KycStatusLogModel.updated_at).label("first_rejection_time")).filter(KycStatusLogModel.status == "rejected", KycStatusLogModel.user_id.in_(user_ids), KycStatusLogModel.created_at <= date).group_by(KycStatusLogModel.user_id).all()
+        return (
+            session.query(
+                KycStatusLogModel.user_id,
+                KycStatusLogModel.remark,
+                func.count().label("rejection_count"),
+                func.min(KycStatusLogModel.updated_at).label("first_rejection_time"),
+            )
+            .filter(
+                KycStatusLogModel.status == "rejected",
+                KycStatusLogModel.user_id.in_(user_ids),
+                KycStatusLogModel.created_at <= date,
+            )
+            .group_by(KycStatusLogModel.user_id, KycStatusLogModel.remark)
+            .all()
+        )
