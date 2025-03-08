@@ -44,7 +44,7 @@ class FillTransactionDetailsService:
                     since = order_fills[-1].created_at
                     total_count += order_fills_count
                 
-            logger.info(f'generated totoal {total_count} transaction details')            
+            logger.info(f'generated total {total_count} transaction details')            
         except Exception as exception:
             logger.error(f'failed to generate transaction details: {exception}')
             traceback.print_exc()

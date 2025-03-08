@@ -6,5 +6,8 @@ class FillsService:
     @staticmethod
     def get_between(since, to, batch_size=500):
         session = TimescaleEngine.get_session()
-        fills = session.query(FillsModel).filter(FillsModel.created_at > since, FillsModel.created_at <= to).order_by(FillsModel.created_at).limit(batch_size).all()
-        return fills
+        try:
+            fills = session.query(FillsModel).filter(FillsModel.created_at > since, FillsModel.created_at <= to).order_by(FillsModel.created_at).limit(batch_size).all()
+            return fills
+        finally:
+            session.close()
