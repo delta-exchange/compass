@@ -2,15 +2,16 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-
 class WalletEngine:
+    _engine = create_engine(
+        f"mysql+mysqlconnector://{os.getenv('WALLET_RDS_USERNAME')}:{os.getenv('WALLET_RDS_PASSWORD')}@{os.getenv('WALLET_RDS_HOSTNAME')}:{os.getenv('WALLET_RDS_PORT')}/{os.getenv('WALLET_RDS_DB_NAME')}",
+        pool_size=100,
+        max_overflow=5,
+        pool_recycle=1800
+    )
+
+    _SessionLocal = sessionmaker(bind=_engine)
+
     @staticmethod
     def get_session():
-        username = os.getenv('WALLET_RDS_USERNAME')
-        password = os.getenv('WALLET_RDS_PASSWORD')
-        host = os.getenv('WALLET_RDS_HOSTNAME')
-        port = os.getenv('WALLET_RDS_PORT')
-        database = os.getenv('WALLET_RDS_DB_NAME')
-        engine = create_engine(f'mysql+mysqlconnector://{username}:{password}@{host}:{port}/{database}')
-        Session = sessionmaker(bind=engine)
-        return Session()
+        return WalletEngine._SessionLocal()
