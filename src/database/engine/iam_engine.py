@@ -1,6 +1,7 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from urllib.parse import quote
 
 class IamEngine:
     @staticmethod
@@ -20,7 +21,7 @@ from sqlalchemy.orm import sessionmaker
 
 class IamEngine:
     _engine = create_engine(
-        f"mysql+mysqlconnector://{os.getenv('IAM_RDS_USERNAME')}:{os.getenv('IAM_RDS_PASSWORD')}@{os.getenv('IAM_RDS_HOSTNAME')}:{os.getenv('IAM_RDS_PORT')}/{os.getenv('IAM_RDS_DB_NAME')}",
+        f"mysql+mysqlconnector://{os.getenv('IAM_RDS_USERNAME')}:{quote(os.getenv('IAM_RDS_PASSWORD'), safe='')}@{os.getenv('IAM_RDS_HOSTNAME')}:{os.getenv('IAM_RDS_PORT')}/{os.getenv('IAM_RDS_DB_NAME')}",
         pool_size=100,
         max_overflow=5,
         pool_recycle=1800
