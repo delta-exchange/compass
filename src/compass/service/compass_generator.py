@@ -17,12 +17,20 @@ from .kyc_rejection_details_service import KycRejectionDetailsService
 from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 import json
+from datetime import datetime, timedelta
+
 class CompassGenerator:
 
     @staticmethod
-    def start():
+    def start(date=None):
         try:
-            from_time, now = DateTimeUtil.get_24hrs_ago(), DateTimeUtil.get_now()
+            from_date, to_date = DateTimeUtil.get_last_date(), DateTimeUtil.get_today_date()
+            if date:
+                from_date = DateTimeUtil.get_date_from_string(date)
+                logger.info(f'generating reports for date: {from_date}')
+                to_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S.%fZ") + timedelta(days=1)
+                to_date = datetime.strftime(to_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+
             reports_directory = os.path.join(os.getcwd(), 'reports', DateTimeUtil.get_current_date())
             logger.info(f'cleaning up reports for directory : {reports_directory}')
             if os.path.exists(reports_directory): shutil.rmtree(reports_directory)
@@ -30,23 +38,23 @@ class CompassGenerator:
 
             ExchangeDetailsService.generate_exchange_details()
 
-            ProductDetailsService.generate_product_details(from_time, now)
+            ProductDetailsService.generate_product_details(from_date, to_date)
             ExchangeTradesService.generate_trade_volume_details()
 
-            KycRejectionDetailsService.generate_rejected_kyc_details(from_time, now)
+            KycRejectionDetailsService.generate_rejected_kyc_details(from_date, to_date)
 
-            LinkedAccountDetailsService.generate_linked_account_details(from_time, now)
-            CustomerDetailsService.generate_customer_details_details(from_time, now)
-            CustomerLoginDetailsService.generate_customer_login_details(from_time, now)
+            LinkedAccountDetailsService.generate_linked_account_details(from_date, to_date)
+            CustomerDetailsService.generate_customer_details_details(from_date, to_date)
+            CustomerLoginDetailsService.generate_customer_login_details(from_date, to_date)
             
-            DepositTransactionService.generate_transaction_details(from_time, now)
-            WithdrawalTransactionService.generate_transaction_details(from_time, now)
-            FillTransactionDetailsService.generate_transaction_details(from_time, now)
+            DepositTransactionService.generate_transaction_details(from_date, to_date)
+            WithdrawalTransactionService.generate_transaction_details(from_date, to_date)
+            FillTransactionDetailsService.generate_transaction_details(from_date, to_date)
 
-            CustomerLastTransactionDetailsService.generate_last_transaction_details(from_time, now)
+            CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
 
             CompassGenerator.add_blank_reports_for_missing_data(reports_directory)
-            # SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
+            SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
             SlackNotifier.send_alert('Compass cron\n```status: Success\n```')
         except:
             exception_message = traceback.format_exc()

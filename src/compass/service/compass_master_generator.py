@@ -21,7 +21,7 @@ class CompassMasterGenerator:
     @staticmethod
     def start():
         try:
-            master_from_time, now, txn_master_from_date = DateTimeUtil.get_master_date(), DateTimeUtil.get_now(), DateTimeUtil.get_txn_master_date()
+            master_from_time, now, txn_master_from_date = DateTimeUtil.get_master_date(), DateTimeUtil.get_current_date(), DateTimeUtil.get_txn_master_date()
             reports_directory = os.path.join(os.getcwd(), 'reports', f"{DateTimeUtil.get_current_date()}")
             logger.info(f'cleaning up reports for directory : {reports_directory}')
             if os.path.exists(reports_directory): shutil.rmtree(reports_directory)
