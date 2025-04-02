@@ -28,7 +28,7 @@ class DateTimeUtil:
     
     @staticmethod
     def get_current_date():
-        return datetime.now(timezone.utc).strftime('%d%m%Y')
+        return (datetime.now(timezone.utc) - timedelta(hours=24)).strftime('%d%m%Y')
     
     @staticmethod
     def get_master_date():

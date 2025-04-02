@@ -6,8 +6,8 @@ logger.setLevel(logging.DEBUG)
 file_handler = logging.FileHandler('app.log') 
 console_handler = logging.StreamHandler()    
 
-file_handler.setLevel(logging.DEBUG)
-console_handler.setLevel(logging.DEBUG)
+file_handler.setLevel(logging.INFO)
+console_handler.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
