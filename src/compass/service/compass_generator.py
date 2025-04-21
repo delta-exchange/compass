@@ -24,6 +24,7 @@ class CompassGenerator:
     @staticmethod
     def start(date=None):
         try:
+            job_started_at = datetime.now()
             from_date, to_date = DateTimeUtil.get_last_date(), DateTimeUtil.get_today_date()
             if date:
                 from_date = DateTimeUtil.get_date_from_string(date)
@@ -53,9 +54,22 @@ class CompassGenerator:
 
             CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
 
+            reports_generated_at = datetime.now()
+
             CompassGenerator.add_blank_reports_for_missing_data(reports_directory)
             SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
-            SlackNotifier.send_alert('Compass cron\n```status: Success\n```')
+
+            files_scp_transfered_at = datetime.now()
+
+            job_time_taken = (files_scp_transfered_at - job_started_at).seconds
+            reports_generation_time_taken = (reports_generated_at - job_started_at).seconds
+            files_scp_transfer_time_taken = (files_scp_transfered_at - reports_generated_at).seconds
+
+            reports = "\n".join(f for f in os.listdir(reports_directory) if os.path.isfile(os.path.join(reports_directory, f)))
+            reports_size = sum(os.path.getsize(os.path.join(reports_directory, f)) for f in os.listdir(reports_directory) if os.path.isfile(os.path.join(reports_directory, f)))
+            reports_size_mb = reports_size / (1024 * 1024)
+
+            SlackNotifier.send_alert(f'Compass cron\n```status: Success\njob_time_taken: {job_time_taken} seconds\nreports_generation_time_taken: {reports_generation_time_taken} seconds\nfiles_scp_transfer_time_taken: {files_scp_transfer_time_taken} seconds\nreports_directory: {reports_directory}\nreports_size: {reports_size_mb:.2f} MB\nreports:\n{reports}```')
         except:
             exception_message = traceback.format_exc()
             logger.error(f'An error occurred while generating reports: {exception_message}')
