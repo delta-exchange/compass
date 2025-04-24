@@ -36,22 +36,22 @@ class CompassGenerator:
             if os.path.exists(reports_directory): shutil.rmtree(reports_directory)
             os.makedirs(reports_directory)
 
-            ExchangeDetailsService.generate_exchange_details()
+            # ExchangeDetailsService.generate_exchange_details()
 
-            ProductDetailsService.generate_product_details(from_date, to_date)
-            ExchangeTradesService.generate_trade_volume_details()
+            # ProductDetailsService.generate_product_details(from_date, to_date)
+            # ExchangeTradesService.generate_trade_volume_details()
 
-            KycRejectionDetailsService.generate_rejected_kyc_details(from_date, to_date)
+            # KycRejectionDetailsService.generate_rejected_kyc_details(from_date, to_date)
 
-            LinkedAccountDetailsService.generate_linked_account_details(from_date, to_date)
-            CustomerDetailsService.generate_customer_details_details(from_date, to_date)
-            CustomerLoginDetailsService.generate_customer_login_details(from_date, to_date)
+            # LinkedAccountDetailsService.generate_linked_account_details(from_date, to_date)
+            # CustomerDetailsService.generate_customer_details_details(from_date, to_date)
+            # CustomerLoginDetailsService.generate_customer_login_details(from_date, to_date)
             
             DepositTransactionService.generate_transaction_details(from_date, to_date)
             WithdrawalTransactionService.generate_transaction_details(from_date, to_date)
             FillTransactionDetailsService.generate_transaction_details(from_date, to_date)
 
-            CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
+            # CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
 
             CompassGenerator.add_blank_reports_for_missing_data(reports_directory)
             SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
