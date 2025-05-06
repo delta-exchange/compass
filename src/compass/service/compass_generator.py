@@ -23,8 +23,8 @@ class CompassGenerator:
 
     @staticmethod
     def start(date=None):
+        job_started_at = datetime.now()
         try:
-            job_started_at = datetime.now()
             from_date, to_date = DateTimeUtil.get_last_date(), DateTimeUtil.get_today_date()
             if date:
                 from_date = DateTimeUtil.get_date_from_string(date)
@@ -73,7 +73,8 @@ class CompassGenerator:
         except:
             exception_message = traceback.format_exc()
             logger.error(f'An error occurred while generating reports: {exception_message}')
-            SlackNotifier.send_alert(f'Compass cron\n```status: Failure\nReason: {exception_message}```')
+            job_time_taken = (datetime.now() - job_started_at).seconds
+            SlackNotifier.send_alert(f'Compass cron\n```status: Failure\njob_time_taken: {job_time_taken} seconds\nreason: {exception_message}```')
 
     @staticmethod
     def add_blank_reports_for_missing_data(reports_directory):
