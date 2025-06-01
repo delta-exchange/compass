@@ -10,7 +10,7 @@ class CorporateAccountModel(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=False)
     parent_corporate_id = Column(Integer, nullable=True)
-    kyc_status = Column(String(255), default="pending" nullable=False)
+    kyc_status = Column(String(255), default="pending", nullable=False)
     aml_check = Column(String(255), nullable=False)
     vendor = Column(String(255), nullable=False)
     meta_data = Column(JSON, nullable=True)
