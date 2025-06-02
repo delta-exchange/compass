@@ -14,6 +14,7 @@ from .withdrawal_transaction_service import WithdrawalTransactionService
 from .product_details_service import ProductDetailsService
 from .order_transaction_service import OrderTransactionDetailsService
 from .kyc_rejection_details_service import KycRejectionDetailsService
+from .joint_holder_details_service import JointHolderDetailsService
 from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 import json

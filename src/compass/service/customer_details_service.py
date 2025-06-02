@@ -25,8 +25,11 @@ class CustomerDetailsService:
                     total_count += len(users)
 
                     users_mapping = CustomerDetailsService.get_users_mapping(users)
+                    
                     user_kyc_details_mapping = KycDocumentsService.get_by_user_ids(list({user.id for user in users_mapping.values() if user.is_kyc_done}))
-                    corporate_accounts_mapping = CorporateAccountDetailsService.get_by_user_ids(list({user.id for user in users_mapping.values() if not user.corporate_account_id == nil}))
+        
+                    corporate_accounts_mapping = CorporateAccountDetailsService.get_by_user_ids(list({user.id for user in users_mapping.values() if not user.corporate_account_id == None}))
+                    
                     ReportService.write_report(report_name, CustomerDetailsService.convert_to_compass_format(users, users_mapping, user_kyc_details_mapping, login_city_list, corporate_accounts_mapping))
                 
             logger.info(f'generated customer details for {total_count} users')
@@ -68,25 +71,26 @@ class CustomerDetailsService:
                 logger.debug(f"user with id: {user.id} not found")
             kyc = user_kyc_details_mapping.get(main_user.id, {}) if main_user else {}
             pincode, state, city = AddressUtil.extract_pincode_state_city(kyc.get("address"), login_city_list)
-            corporate_account = corporate_accounts_mapping.get(main_user.user_id, {}) if main_user else {}
+            corporate_account = corporate_accounts_mapping.get(main_user.id, {}) if main_user else {}
+            # print(corporate_account)
             if not state:
                 state = main_user.region if main_user else None
                 
-            if not main_user.corporate_account_id == nil:
+            if not main_user.corporate_account_id == None:
                 user_data = {
                     'Customer ID': user.id,
                     'Constitutiopn Type': 'Corporate',  # Changed for corporate
-                    'Customer Type': 'Individual',  # Changed for corporate
+                    'Customer Type': user.occupation,  # Changed for corporate
                     'PRIMARY_SEGMENT': 'Futures & Options',
-                    'Customer Name': corporate_account.get('entity_name'),  # Changed for corporate
+                    'Customer Name': corporate_account.entity_name if corporate_account else None,  # Changed for corporate
                     'FirstName': main_user.first_name if main_user else None,
                     'MiddleName': None,
                     'LastName': main_user.last_name if main_user else None,
                     'Spouse/Partner Name': None,
                     'Created Date Time': user.created_at,
-                    'Date of Birth / Incorporation': main_user.dob if main_user else None,
+                    'Date of Birth / Incorporation': main_user.dob if main_user else None, # will store it in DB
                     'Age': DateTimeUtil.get_age_by_dob(main_user.dob) if main_user else None,
-                    'Place of Birth / Incorporation': None,
+                    'Place of Birth / Incorporation': None,  # will store it in DB
                     'Nationality': main_user.country if main_user else None,
                     'Residential Status': None, 
                     'Salutation': None,
@@ -94,16 +98,16 @@ class CustomerDetailsService:
                     'Mother Name': None,
                     'Gender': None,
                     'OccupationCode': main_user.occupation if main_user else None,
-                    'Nature of Business': main_user.occupation if main_user else None,
+                    'Nature of Business': corporate_account.business_description if corporate_account else None, # will store it in DB
                     'Credit Rating': None,
-                    'PAN No': corporate_account.get('entity_registration_number'),  # Changed for corporate
+                    'PAN No': kyc.get('pan_number'),
                     'Passport No': None,
                     'Driving License No': None,
                     'VoterIdentityCardNo': None,
                     'IdentityNo': kyc.get('aadhaar_number'),
                     'TAX ID': None,
                     'Annual Income': None,
-                    'Income From Business': None,
+                    'Income From Business': main_user.income if main_user else None,
                     'Other Income': None,
                     'Net Worth': None,
                     'Investments Val': None,
@@ -112,7 +116,7 @@ class CustomerDetailsService:
                     'WebSite': None,
                     'Remarks': None,
                     'Education': None,
-                    'CBS_RiskRating': None,
+                    'CBS_RiskRating': main_user.risk_score,
                     'RM Code': None,
                     'RM Name': None,
                     'RM Mobile': None,
@@ -164,7 +168,7 @@ class CustomerDetailsService:
                     'TAN': None,
                     'GSTIN': None,
                     'IEC Code': None,
-                    'Office AddressLine1': None,
+                    'Office AddressLine1': None, # will store it in DB
                     'Office AddressLine2': None,
                     'Office AddressCity': None,
                     'Office AddressState': None,
@@ -179,7 +183,7 @@ class CustomerDetailsService:
                     'CUSTOMER_STATUS': None,
                     'ANNUAL_SALES': None,
                     'Country of Nationality': main_user.country if main_user else None,
-                    'Country of Incorporation': main_user.country if main_user else None,
+                    'Country of Incorporation': main_user.country if main_user else None, #will store it in db
                     'Registered AddressLine1': kyc.get("address"),
                     'Registered AddressLine2': None,
                     'Registered AddressCity': city,
@@ -267,7 +271,7 @@ class CustomerDetailsService:
                     'WebSite': None,
                     'Remarks': None,
                     'Education': None,
-                    'CBS_RiskRating': None,
+                    'CBS_RiskRating': main_user.risk_score,
                     'RM Code': None,
                     'RM Name': None,
                     'RM Mobile': None,
