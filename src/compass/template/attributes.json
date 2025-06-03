@@ -151,6 +151,19 @@
         "CUSTOMERONBOARDING_GEOLOCATION",
         "CUSTOMER_FAMILYCODE/CUSTOMER_GROUPCODE"
     ],
+    "JHD": [
+        "AccountNo",
+        "CustomerId",
+        "JointHolderType",
+        "JointHolderName",
+        "RelationCode",
+        "EffectiveDate",
+        "Ineffective Date",
+        "DIN / DPIN",
+        "DATA_SOURCE",
+        "UPDATE_TIMESTAMP",
+        "EXTRACTION_DATE"
+    ],
     "CTD": [
         "CUSTOMERID",
         "EXCHANGECODE",

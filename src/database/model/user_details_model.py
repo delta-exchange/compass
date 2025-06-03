@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, BigInteger, String, Boolean, DateTime, Date, Enum, JSON, ForeignKey
+    Column, Integer, BigInteger, String, Boolean, DateTime, Date, Enum, JSON, ForeignKey, DECIMAL
 )
 from sqlalchemy.orm import declarative_base
 
@@ -58,3 +58,5 @@ class UserDetailsModel(Base):
     corporate_account_id = Column(String(255), nullable=True)
     occupation = Column(String(255), nullable=True)
     income = Column(String(255), nullable=True)
+    risk_score = Column(DECIMAL(36, 18), nullable=True)
+    

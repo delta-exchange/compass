@@ -9,3 +9,4 @@ from .fill_transaction_service import FillTransactionDetailsService
 from .compass_generator import CompassGenerator
 from .product_details_service import ProductDetailsService
 from .compass_master_generator import CompassMasterGenerator
+from .joint_holder_details_service import JointHolderDetailsService
