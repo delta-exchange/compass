@@ -38,39 +38,40 @@ class CompassGenerator:
             if os.path.exists(reports_directory): shutil.rmtree(reports_directory)
             os.makedirs(reports_directory)
 
-            ExchangeDetailsService.generate_exchange_details()
+            # ExchangeDetailsService.generate_exchange_details()
 
-            ProductDetailsService.generate_product_details(from_date, to_date)
-            ExchangeTradesService.generate_trade_volume_details()
+            # ProductDetailsService.generate_product_details(from_date, to_date)
+            # ExchangeTradesService.generate_trade_volume_details()
 
-            KycRejectionDetailsService.generate_rejected_kyc_details(from_date, to_date)
+            # KycRejectionDetailsService.generate_rejected_kyc_details(from_date, to_date)
 
-            LinkedAccountDetailsService.generate_linked_account_details(from_date, to_date)
+            # LinkedAccountDetailsService.generate_linked_account_details(from_date, to_date)
             CustomerDetailsService.generate_customer_details_details(from_date, to_date)
-            CustomerLoginDetailsService.generate_customer_login_details(from_date, to_date)
+            JointHolderDetailsService.generate_joint_holder_details(from_date, to_date)
+            # CustomerLoginDetailsService.generate_customer_login_details(from_date, to_date)
             
-            DepositTransactionService.generate_transaction_details(from_date, to_date)
-            WithdrawalTransactionService.generate_transaction_details(from_date, to_date)
-            FillTransactionDetailsService.generate_transaction_details(from_date, to_date)
+            # DepositTransactionService.generate_transaction_details(from_date, to_date)
+            # WithdrawalTransactionService.generate_transaction_details(from_date, to_date)
+            # FillTransactionDetailsService.generate_transaction_details(from_date, to_date)
 
-            CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
+            # CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
 
-            reports_generated_at = datetime.now()
+            # reports_generated_at = datetime.now()
 
-            CompassGenerator.add_blank_reports_for_missing_data(reports_directory)
-            SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
+            # CompassGenerator.add_blank_reports_for_missing_data(reports_directory)
+            # SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
 
-            files_scp_transfered_at = datetime.now()
+            # files_scp_transfered_at = datetime.now()
 
-            job_time_taken = (files_scp_transfered_at - job_started_at).seconds
-            reports_generation_time_taken = (reports_generated_at - job_started_at).seconds
-            files_scp_transfer_time_taken = (files_scp_transfered_at - reports_generated_at).seconds
+            # job_time_taken = (files_scp_transfered_at - job_started_at).seconds
+            # reports_generation_time_taken = (reports_generated_at - job_started_at).seconds
+            # files_scp_transfer_time_taken = (files_scp_transfered_at - reports_generated_at).seconds
 
-            reports = "\n".join(f for f in os.listdir(reports_directory) if os.path.isfile(os.path.join(reports_directory, f)))
-            reports_size = sum(os.path.getsize(os.path.join(reports_directory, f)) for f in os.listdir(reports_directory) if os.path.isfile(os.path.join(reports_directory, f)))
-            reports_size_mb = reports_size / (1024 * 1024)
+            # reports = "\n".join(f for f in os.listdir(reports_directory) if os.path.isfile(os.path.join(reports_directory, f)))
+            # reports_size = sum(os.path.getsize(os.path.join(reports_directory, f)) for f in os.listdir(reports_directory) if os.path.isfile(os.path.join(reports_directory, f)))
+            # reports_size_mb = reports_size / (1024 * 1024)
 
-            SlackNotifier.send_alert(f'Compass cron\n```status: Success\njob_time_taken: {job_time_taken} seconds\nreports_generation_time_taken: {reports_generation_time_taken} seconds\nfiles_scp_transfer_time_taken: {files_scp_transfer_time_taken} seconds\nreports_directory: {reports_directory}\nreports_size: {reports_size_mb:.2f} MB\nreports:\n{reports}```')
+            # SlackNotifier.send_alert(f'Compass cron\n```status: Success\njob_time_taken: {job_time_taken} seconds\nreports_generation_time_taken: {reports_generation_time_taken} seconds\nfiles_scp_transfer_time_taken: {files_scp_transfer_time_taken} seconds\nreports_directory: {reports_directory}\nreports_size: {reports_size_mb:.2f} MB\nreports:\n{reports}```')
         except:
             exception_message = traceback.format_exc()
             logger.error(f'An error occurred while generating reports: {exception_message}')
