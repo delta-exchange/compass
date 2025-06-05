@@ -7,7 +7,7 @@ class ReportsCleaner:
 
     @staticmethod
     def clean_older_reports():
-        cutoff_date = datetime.today() - timedelta(days=33)
+        cutoff_date = datetime.today() - timedelta(days=5)
 
         reports_directory = os.path.join(os.getcwd(), 'reports')
         directory_list = os.listdir(reports_directory)
