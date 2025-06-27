@@ -135,7 +135,8 @@ class FillTransactionDetailsService:
                 'TRANSACTIONPROCESSED_PINCODE': None,
                 'TRANSACTIONPROCESSED_COUNTRY': country,
                 'TRANSACTIONPROCESSED_GEOLOCATION': None,
-                'TRANSACTION_IDENTIFIER': 'ORDER_FILL'
+                'TRANSACTION_IDENTIFIER': 'ORDER_FILL',
+                "PNL": fill.pnl
             })
         
         return transactions_compass
