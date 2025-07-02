@@ -44,7 +44,7 @@ class UserBankAccountService:
     def get_user_banks_by_user_ids_and_status(user_ids, status):
         session = WalletEngine.get_session()
         try:
-            user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.user_id.in_(user_ids), UserBankAccountModel.custodian_status == status).all()
+            user_bank_accounts = session.query(UserBankAccountModel).filter(UserBankAccountModel.user_id.in_(user_ids), UserBankAccountModel.custodian_status == status).order_by(UserBankAccountModel.created_at).all()
             return user_bank_accounts
         finally:
             session.close()

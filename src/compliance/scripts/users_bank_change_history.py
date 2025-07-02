@@ -34,10 +34,11 @@ def generate_users_bank_change_history(from_date, to_date = None):
             user_bank_map = get_user_banks_mapping(user_ids)
 
             user_bank_changes_data = get_user_bank_changes_data(user_bank_account_status_logs, users_mapping, approved_kyc_mapping, user_bank_map)
+            logger.info(f"bank changes count: {len(user_bank_changes_data)}")
+
             add_to_csv_file(user_bank_changes_data)
     
-            from_date = user_bank_account_status_logs[-1].created_at
-                        
+            from_date = user_bank_account_status_logs[0].created_at         
     except Exception as e:
         logger.error(f"Error generating users bank change history: {e}")
         traceback.print_exc()
@@ -80,8 +81,9 @@ def get_user_bank_changes_data(user_bank_account_status_logs, users_mapping, app
             logger.error(f"User with ID {user_id} not found for bank change history log.")
             continue
         
-        user_banks = user_bank_map.get(user_id, [])
-        last_bank = next((bank for bank in user_banks if bank.created_at < user_bank_account_status_log.created_at ), None)
+        user_banks = user_bank_map.get(user_id, [])[::-1]
+
+        last_bank = next((bank for bank in user_banks if bank.created_at <= user_bank_account_status_log.created_at ), None)
         last_to_last_bank = next((bank for bank in user_banks if last_bank and bank.created_at < last_bank.created_at ), None)
         if not last_to_last_bank:
             continue
@@ -90,7 +92,7 @@ def get_user_bank_changes_data(user_bank_account_status_logs, users_mapping, app
 
         user_bank_changes.append([
             user_id,
-            user.first_name + " " + user.last_name if user.first_name and user.last_name else "NA",
+            (user.first_name or "") + " " + (user.last_name or ""),
             kyc_approval_log.created_at.strftime("%Y-%m-%d %H:%M:%S") if kyc_approval_log else "N/A",
             last_to_last_bank.account_number if len(user_banks) > 0 else "N/A",
             last_to_last_bank.ifsc_code if len(user_banks) > 0 else "N/A",
