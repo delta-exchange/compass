@@ -38,7 +38,7 @@ def generate_users_bank_change_history(from_date, to_date = None):
 
             add_to_csv_file(user_bank_changes_data)
     
-            from_date = user_bank_account_status_logs[0].created_at         
+            to_date = user_bank_account_status_logs[-1].created_at      
     except Exception as e:
         logger.error(f"Error generating users bank change history: {e}")
         traceback.print_exc()
