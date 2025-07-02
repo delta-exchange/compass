@@ -20,7 +20,7 @@ def generate_users_bank_change_history(from_date, to_date = None):
         create_csv_file(['User ID', 'Name', 'Account Activation Date', 'Old Bank Account Number', 'Old Bank IFSC', 'New Bank Account Number', 'New Bank IFSC', 'Change Date', 'Individual/Non-Individual Account'])
 
         while True:
-            logger.info(f"From: {from_date}")
+            logger.info(f"To Date: {to_date}")
 
             user_bank_account_status_logs = UserBankAccountService.get_user_bank_change_status_logs_by_status_and_between("completed", from_date, to_date)
             user_bank_account_status_logs_count = len(user_bank_account_status_logs)
@@ -82,6 +82,9 @@ def get_user_bank_changes_data(user_bank_account_status_logs, users_mapping, app
             continue
         
         user_banks = user_bank_map.get(user_id, [])[::-1]
+
+        if len(user_banks) < 3:
+            continue
 
         last_bank = next((bank for bank in user_banks if bank.created_at <= user_bank_account_status_log.created_at ), None)
         last_to_last_bank = next((bank for bank in user_banks if last_bank and bank.created_at < last_bank.created_at ), None)
