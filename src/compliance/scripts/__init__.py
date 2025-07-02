@@ -1,0 +1,1 @@
+from .users_bank_change_history import generate_users_bank_change_history

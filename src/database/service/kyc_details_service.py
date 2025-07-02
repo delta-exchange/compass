@@ -64,3 +64,12 @@ class KycDocumentsService:
             return rejection_stats
         finally:
             session.close()
+
+    @staticmethod
+    def get_approved_kyc_status_by_user_ids(user_ids):
+        session = IamEngine.get_session()
+        try:
+            kyc_status_logs = session.query(KycStatusLogModel).filter(KycStatusLogModel.user_id.in_(user_ids), KycStatusLogModel.status == "approved", KycStatusLogModel.kyc_verification_type == "address_verification").order_by(KycStatusLogModel.created_at.desc()).all()
+            return kyc_status_logs
+        finally:
+            session.close()
