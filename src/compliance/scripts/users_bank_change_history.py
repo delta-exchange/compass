@@ -35,6 +35,8 @@ def generate_users_bank_change_history(from_date, to_date = None):
 
             user_bank_changes_data = get_user_bank_changes_data(user_bank_account_status_logs, users_mapping, approved_kyc_mapping, user_bank_map)
             logger.info(f"bank changes count: {len(user_bank_changes_data)}")
+            if len(user_bank_changes_data) == 0:
+                break
 
             add_to_csv_file(user_bank_changes_data)
     
