@@ -118,8 +118,8 @@ class OrderTransactionDetailsService:
                 'TRANSACTIONPROCESSED_PINCODE': None,
                 'TRANSACTIONPROCESSED_COUNTRY': None,
                 'TRANSACTIONPROCESSED_GEOLOCATION': None,
-                'TRANSACTION_IDENTIFIER': 'ORDER',
-                "PNL": None
+                'TRANSACTION_IDENTIFIER': 'ORDER'
+                # "PNL": None
             })
         
         return transactions_compass

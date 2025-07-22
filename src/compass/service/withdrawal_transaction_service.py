@@ -120,8 +120,8 @@ class WithdrawalTransactionService:
                 'TRANSACTIONPROCESSED_PINCODE': None,
                 'TRANSACTIONPROCESSED_COUNTRY': country,
                 'TRANSACTIONPROCESSED_GEOLOCATION': None,
-                'TRANSACTION_IDENTIFIER': 'FIAT_WITHDRAWAL',
-                "PNL": None
+                'TRANSACTION_IDENTIFIER': 'FIAT_WITHDRAWAL'
+                # "PNL": None
             })
         
         return transactions_compass

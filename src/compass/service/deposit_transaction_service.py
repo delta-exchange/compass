@@ -128,8 +128,8 @@ class DepositTransactionService:
                 'TRANSACTIONPROCESSED_PINCODE': None,
                 'TRANSACTIONPROCESSED_COUNTRY': country,
                 'TRANSACTIONPROCESSED_GEOLOCATION': None,
-                'TRANSACTION_IDENTIFIER': 'FIAT_DEPOSIT',
-                "PNL": None
+                'TRANSACTION_IDENTIFIER': 'FIAT_DEPOSIT'
+                # "PNL": None
             })
         
         return transactions_compass
