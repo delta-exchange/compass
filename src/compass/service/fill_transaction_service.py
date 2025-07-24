@@ -136,7 +136,7 @@ class FillTransactionDetailsService:
                 'TRANSACTIONPROCESSED_COUNTRY': country,
                 'TRANSACTIONPROCESSED_GEOLOCATION': None,
                 'TRANSACTION_IDENTIFIER': 'ORDER_FILL',
-                "PNL": fill.pnl
+                "PNL": float(fill.pnl) if fill.pnl else None
             })
         
         return transactions_compass
