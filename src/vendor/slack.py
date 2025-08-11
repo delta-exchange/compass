@@ -6,11 +6,9 @@ import time
 
 class SlackNotifier:
     @staticmethod
-    def send_alert(message, retry_count=3):
+    def send_alert(webhook_url, message, retry_count=3):
         try:
-            webhook_url = os.getenv("SLACK_WEBHOOK_URL")
-            channel = os.getenv("SLACK_CHANNEL")
-            payload = {"channel": channel, "text": message}
+            payload = {"text": message}
             response = requests.post(
                 webhook_url,
                 data=json.dumps(payload),

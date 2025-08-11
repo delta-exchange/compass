@@ -39,11 +39,11 @@ class CompassMasterGenerator:
             FillTransactionDetailsService.generate_transaction_details(txn_master_from_date, now)
 
             SCPTransfer.push_files_to_remote_server_by_directory(reports_directory)
-            SlackNotifier.send_alert('Compass cron(Master dump)\n```status: Success\n```')
+            SlackNotifier.send_alert(os.getenv('SLACK_COMPASS_WEBHOOK_URL'), 'Compass cron(Master dump)\n```status: Success\n```')
         except:
             exception_message = traceback.format_exc()
             logger.error(f'An error occurred while generating reports: {exception_message}')
-            SlackNotifier.send_alert(f'Compass cron\n```status: Failure\nReason: {exception_message}```')
+            SlackNotifier.send_alert(os.getenv('SLACK_COMPASS_WEBHOOK_URL'), f'Compass cron\n```status: Failure\nReason: {exception_message}```')
 
     @staticmethod
     def add_blank_reports_for_missing_data(reports_directory):
