@@ -108,7 +108,7 @@ class CalendarEventsAggregator:
                     f"Delta Exchange Calendar POST API Failed\n```status: {delta_exchange_api_status}\nReason: {delta_exchange_api_response}```"
                 )
             else:
-                published_events.append(event)
+                published_events.append({**event, "description": "..."})
         
         if published_events:
             SlackNotifier.send_alert(
