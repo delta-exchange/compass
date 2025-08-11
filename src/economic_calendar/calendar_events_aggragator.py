@@ -30,7 +30,7 @@ class CalendarEventsAggregator:
             ]
         ]
         
-        delta_exchange_api_status, upcoming_delta_exchange_registered_events = DeltaExchangeCalendarAPI.get_delta_calendar_events()
+        delta_exchange_api_status, upcoming_delta_exchange_registered_events = DeltaExchangeCalendarAPI.get_delta_calendar_events(start_date, end_date)
 
         if delta_exchange_api_status != 200:
             SlackNotifier.send_alert(
@@ -39,15 +39,16 @@ class CalendarEventsAggregator:
             )
             return
 
-        upcoming_delta_exchange_registered_events_map = {
-            event["title"]: event 
+        upcoming_delta_exchange_registered_event_ids = {
+            event["meta_data"]["source_id"]
             for event in upcoming_delta_exchange_registered_events
+            if event["meta_data"] and event["meta_data"].get("source_id")
         }
 
         upcoming_trading_economics_events_to_register = [
             event 
             for event in upcoming_trading_economics_relevant_events 
-            if not upcoming_delta_exchange_registered_events_map.get(event["Event"], False)
+            if event["CalendarId"] not in upcoming_delta_exchange_registered_event_ids
         ]
 
         upcoming_trading_economics_events_to_register = CalendarEventsAggregator.add_event_descriptions(upcoming_trading_economics_events_to_register) 
@@ -59,6 +60,8 @@ class CalendarEventsAggregator:
             "category": event["Category"],
             "tags": [event["Ticker"]],
             "created_by": "trading economics api",
+            "source_id": event["CalendarId"],
+            "source_url": f"{os.getenv('TRADING_ECONOMICS_WEB_URL')}{event['URL']}"
         } for event in upcoming_trading_economics_events_to_register]
 
         CalendarEventsAggregator.register_events_on_delta_exchange(events_to_register_on_delta_exchange)

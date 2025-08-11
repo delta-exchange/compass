@@ -3,11 +3,8 @@ import requests
 
 class DeltaExchangeCalendarAPI:
     @staticmethod
-    def get_delta_calendar_events(after = None):
-        url = f"{os.getenv('TRADING_ENGINE_SLAVE_URL')}/v2/events/summary?page_size=100"
-
-        if after:
-            url += f"&after={after}"
+    def get_delta_calendar_events(start_date, end_date, page = 1):
+        url = f"{os.getenv('TRADING_ENGINE_MASTER_URL')}/v2/support/events?start_date={start_date}&end_date={end_date}&page={page}page_size=100"
         
         response = requests.get(url)
 
@@ -15,16 +12,16 @@ class DeltaExchangeCalendarAPI:
             return response.status_code, response.text
         
         result = response.json()["result"]
-
-        if not result["meta"]["after"]:
-            return response.status_code, response.json()["result"]["events"]
         
-        next_events_status, next_events = DeltaExchangeCalendarAPI.get_delta_calendar_events(result["meta"]["after"])
+        if result["events"]:
+            next_events_status, next_events = DeltaExchangeCalendarAPI.get_delta_calendar_events(start_date, end_date, result["meta"]["page"] + 1)
 
-        if next_events_status != 200:
-            return next_events_status, next_events
+            if next_events_status != 200:
+                return next_events_status, next_events
 
-        return response.status_code, (result["events"] + next_events)
+            return response.status_code, (result["events"] + next_events)
+
+        return response.status_code, result
     
     @staticmethod
     def register_event(event):
