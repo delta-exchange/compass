@@ -4,7 +4,7 @@ import requests
 class DeltaExchangeCalendarAPI:
     @staticmethod
     def get_delta_calendar_events(start_date, end_date, page = 1):
-        url = f"{os.getenv('TRADING_ENGINE_MASTER_URL')}/v2/support/events?start_date={start_date}&end_date={end_date}&page={page}page_size=100"
+        url = f"{os.getenv('TRADING_ENGINE_MASTER_URL')}/v2/support/events?start_date={start_date}&end_date={end_date}&page={page}&page_size=100"
         
         response = requests.get(url)
 
@@ -21,7 +21,7 @@ class DeltaExchangeCalendarAPI:
 
             return response.status_code, (result["events"] + next_events)
 
-        return response.status_code, result
+        return response.status_code, result["events"]
     
     @staticmethod
     def register_event(event):
@@ -29,7 +29,7 @@ class DeltaExchangeCalendarAPI:
 
         response = requests.post(url, json = event)
 
-        if response.status_code != 200:
+        if response.status_code != 201:
             return response.status_code, response.text
 
         return response.status_code, response.json()

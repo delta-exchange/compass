@@ -40,7 +40,7 @@ class CalendarEventsAggregator:
             return
 
         upcoming_delta_exchange_registered_event_ids = {
-            event["meta_data"]["source_id"]
+            str(event["meta_data"]["source_id"])
             for event in upcoming_delta_exchange_registered_events
             if event["meta_data"] and event["meta_data"].get("source_id")
         }
@@ -102,7 +102,7 @@ class CalendarEventsAggregator:
         for event in events:
             delta_exchange_api_status, delta_exchange_api_response = DeltaExchangeCalendarAPI.register_event(event)
 
-            if delta_exchange_api_status != 200:
+            if delta_exchange_api_status != 201:
                 SlackNotifier.send_alert(
                     os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
                     f"Delta Exchange Calendar POST API Failed\n```status: {delta_exchange_api_status}\nReason: {delta_exchange_api_response}```"
