@@ -33,6 +33,6 @@ class DeltaExchangeCalendarAPI:
         response = requests.post(url, json = event)
 
         if response.status_code != 200:
-            return False, response.text
+            return response.status_code, response.text
 
-        return True, response.json()
+        return response.status_code, response.json()
