@@ -1,5 +1,6 @@
 import os
 import time
+import calendar
 import json
 from .trading_economics import TradingEconomicsCalendarAPI, TradingEconomicsEventWebPageScrapper
 from .delta_exchange import DeltaExchangeCalendarAPI
@@ -61,7 +62,9 @@ class CalendarEventsAggregator:
             "tags": [event["Ticker"]],
             "created_by": "trading economics api",
             "source_id": event["CalendarId"],
-            "source_url": f"{os.getenv('TRADING_ECONOMICS_WEB_URL')}{event['URL']}"
+            "source_url": f"{os.getenv('TRADING_ECONOMICS_WEB_URL')}{event['URL']}",
+            "country": event["Country"],
+            "timestamp": calendar.timegm(time.strptime(event["Date"], "%Y-%m-%dT%H:%M:%S"))
         } for event in upcoming_trading_economics_events_to_register]
 
         CalendarEventsAggregator.register_events_on_delta_exchange(events_to_register_on_delta_exchange)
@@ -113,5 +116,5 @@ class CalendarEventsAggregator:
         if published_events:
             SlackNotifier.send_alert(
                 os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
-                f"New Events Published\n```{json.dumps(published_events, indent=2)}```"
+                f"Total {len(published_events)} New Events Published\n```{json.dumps(published_events, indent=2)}```"
             )
