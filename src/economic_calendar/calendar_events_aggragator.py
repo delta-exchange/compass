@@ -6,6 +6,8 @@ from .trading_economics import TradingEconomicsCalendarAPI, TradingEconomicsEven
 from .delta_exchange import DeltaExchangeCalendarAPI
 from src.vendor import SlackNotifier
 
+MAX_COUNT_TRADING_ECONOMIC_EVENTS_OF_PUSH_NOTIFICATION = 1
+
 class CalendarEventsAggregator:
     @staticmethod
     def execute():
@@ -19,17 +21,6 @@ class CalendarEventsAggregator:
                 f"Trading Economics Calendar API Failed\n```status: {trading_economic_api_status}\nReason: {upcoming_trading_economics_events}```"
             )
             return
-        
-        upcoming_trading_economics_relevant_events = [
-            event
-            for event in upcoming_trading_economics_events
-            if event["Ticker"] in [
-                "FDTR", # FOMC
-                "CPI YOY",
-                "USACIRM",
-                "USAPPIM", # PPI
-            ]
-        ]
         
         delta_exchange_api_status, upcoming_delta_exchange_registered_events = DeltaExchangeCalendarAPI.get_delta_calendar_events(start_date, end_date)
 
@@ -48,7 +39,7 @@ class CalendarEventsAggregator:
 
         upcoming_trading_economics_events_to_register = [
             event 
-            for event in upcoming_trading_economics_relevant_events 
+            for event in upcoming_trading_economics_events 
             if event["CalendarId"] not in upcoming_delta_exchange_registered_event_ids
         ]
 
@@ -60,12 +51,25 @@ class CalendarEventsAggregator:
             "description": event["description"],
             "category": event["Category"],
             "tags": [event["Ticker"]],
-            "created_by": "trading economics api",
+            "created_by": "trading_economics_api",
             "source_id": event["CalendarId"],
             "source_url": f"{os.getenv('TRADING_ECONOMICS_WEB_URL')}{event['URL']}",
             "country": event["Country"],
             "timestamp": calendar.timegm(time.strptime(event["Date"], "%Y-%m-%dT%H:%M:%S"))
         } for event in upcoming_trading_economics_events_to_register]
+
+        upcoming_trading_economics_events_of_push_notification = [
+            event
+            for event in events_to_register_on_delta_exchange
+            if event["tags"][0] in [
+                "FDTR", # FOMC
+                "CPI YOY",
+                "USACIRM",
+                "USAPPIM", # PPI
+            ]
+        ]
+
+        events_to_register_on_delta_exchange = upcoming_trading_economics_events_of_push_notification[:MAX_COUNT_TRADING_ECONOMIC_EVENTS_OF_PUSH_NOTIFICATION]
 
         CalendarEventsAggregator.register_events_on_delta_exchange(events_to_register_on_delta_exchange)
 
