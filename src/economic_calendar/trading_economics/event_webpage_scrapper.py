@@ -1,3 +1,4 @@
+import re
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -27,4 +28,4 @@ class TradingEconomicsEventWebPageScrapper:
         # remove child span inside <h2>
         description_header.find("span").decompose() 
 
-        return True, description_header.get_text(strip=True)
+        return True, re.sub(r"[^a-zA-Z0-9\s.,!?@#%&()\-_=+:/]", "", description_header.get_text(strip=True))
