@@ -46,7 +46,7 @@ class CalendarEventsAggregator:
         upcoming_trading_economics_events_to_register = CalendarEventsAggregator.add_event_descriptions(upcoming_trading_economics_events_to_register) 
 
         events_to_register_on_delta_exchange = [{
-            "title": event["Event"],
+            "title": CalendarEventsAggregator.get_delta_title(event["Event"]),
             "date": event["Date"][:10], # first 10: YYYY-MM-DD 
             "description": event["description"],
             "category": event["Category"],
@@ -122,3 +122,10 @@ class CalendarEventsAggregator:
                 os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
                 f"Total {len(published_events)} New Events Published\n```{json.dumps(published_events, indent=2)}```"
             )
+
+    @staticmethod
+    def get_delta_title(title):
+        if title.strip().lower() == "fomc minutes":
+            return "FOMC:Federal Open Market Committee Meeting"
+
+        return title
