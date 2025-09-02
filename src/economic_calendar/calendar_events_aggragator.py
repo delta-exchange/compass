@@ -31,29 +31,29 @@ class CalendarEventsAggregator:
             )
             return
 
-        upcoming_delta_exchange_registered_event_ids = {
+        upcoming_delta_exchange_registered_event_urls = {
             str(event["meta_data"]["source_id"])
             for event in upcoming_delta_exchange_registered_events
-            if event["meta_data"] and event["meta_data"].get("source_id")
+            if event["meta_data"] and event["meta_data"].get("source_url")
         }
 
         upcoming_trading_economics_events_to_register = [
             event 
             for event in upcoming_trading_economics_events 
-            if event["CalendarId"] not in upcoming_delta_exchange_registered_event_ids
+            if CalendarEventsAggregator.get_trading_economics_event_url(event) not in upcoming_delta_exchange_registered_event_urls
         ]
 
         upcoming_trading_economics_events_to_register = CalendarEventsAggregator.add_event_descriptions(upcoming_trading_economics_events_to_register) 
 
         events_to_register_on_delta_exchange = [{
-            "title": CalendarEventsAggregator.get_delta_title(event["Event"]),
+            "title": CalendarEventsAggregator.get_delta_title(event["Event"], event["Ticker"]),
             "date": event["Date"][:10], # first 10: YYYY-MM-DD 
             "description": event["description"],
             "category": event["Category"],
             "tags": [event["Ticker"]],
             "created_by": "trading_economics_api",
             "source_id": event["CalendarId"],
-            "source_url": f"{os.getenv('TRADING_ECONOMICS_WEB_URL')}{event['URL']}",
+            "source_url": CalendarEventsAggregator.get_trading_economics_event_url(event),
             "country": event["Country"],
             "timestamp": calendar.timegm(time.strptime(event["Date"], "%Y-%m-%dT%H:%M:%S"))
         } for event in upcoming_trading_economics_events_to_register]
@@ -124,8 +124,16 @@ class CalendarEventsAggregator:
             )
 
     @staticmethod
-    def get_delta_title(title):
-        if title.strip().lower() == "fomc minutes":
-            return "FOMC:Federal Open Market Committee Meeting"
+    def get_delta_title(title, ticker):
+        if ticker == "FDTR":
+            return "FOMC: Federal Open Market Committee Meeting"
+        if ticker == "CPI YOY" or ticker == "USACIRM":
+            return "US CPI: US Consumer Price Index"
+        if ticker == "USAPPIM":
+            return "US PPI: US Producer Price Index"
 
         return title
+    
+    @staticmethod
+    def get_trading_economics_event_url(event):
+        return f"{os.getenv('TRADING_ECONOMICS_WEB_URL')}{event['URL']}"
