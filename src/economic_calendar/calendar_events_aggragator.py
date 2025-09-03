@@ -126,11 +126,11 @@ class CalendarEventsAggregator:
     @staticmethod
     def get_delta_title(title, ticker):
         if ticker == "FDTR":
-            return "FOMC: Federal Open Market Committee Meeting"
+            return "FOMC:Federal Open Market Committee Meeting"
         if ticker == "CPI YOY" or ticker == "USACIRM":
-            return "US CPI: US Consumer Price Index"
+            return "US CPI:US Consumer Price Index"
         if ticker == "USAPPIM":
-            return "US PPI: US Producer Price Index"
+            return "US PPI:US Producer Price Index"
 
         return title
     
