@@ -32,7 +32,7 @@ class CalendarEventsAggregator:
             return
 
         upcoming_delta_exchange_registered_event_urls = {
-            str(event["meta_data"]["source_id"])
+            str(event["meta_data"]["source_url"])
             for event in upcoming_delta_exchange_registered_events
             if event["meta_data"] and event["meta_data"].get("source_url")
         }
