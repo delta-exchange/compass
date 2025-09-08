@@ -33,7 +33,7 @@ class CalendarEventsAggregator:
         if trading_economic_api_status != 200:
             SlackNotifier.send_alert(
                 os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
-                f"Trading Economics Calendar API Failed\n```status: {trading_economic_api_status}\nReason: {upcoming_trading_economics_events}```"
+                f"<!here> Trading Economics Calendar API Failed\n```status: {trading_economic_api_status}\nReason: {upcoming_trading_economics_events}```"
             )
             return
         
@@ -42,7 +42,7 @@ class CalendarEventsAggregator:
         if delta_exchange_api_status != 200:
             SlackNotifier.send_alert(
                 os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
-                f"Delta Exchange Calendar GET API Failed\n```status: {delta_exchange_api_status}\nReason: {upcoming_delta_exchange_registered_events}```"
+                f"<!here> Delta Exchange Calendar GET API Failed\n```status: {delta_exchange_api_status}\nReason: {upcoming_delta_exchange_registered_events}```"
             )
             return
 
@@ -109,7 +109,7 @@ class CalendarEventsAggregator:
                 event["description"] = event["Event"]
                 SlackNotifier.send_alert(
                     os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
-                    f"Trading Economics Web Scrapper Failed\n```Reason: {description}```"
+                    f"<!here> Trading Economics Web Scrapper Failed\n```Reason: {description}```"
                 )
             else:
                 event["description"] = description
@@ -127,7 +127,7 @@ class CalendarEventsAggregator:
             if delta_exchange_api_status != 201:
                 SlackNotifier.send_alert(
                     os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
-                    f"Delta Exchange Calendar POST API Failed\n```status: {delta_exchange_api_status}\nReason: {delta_exchange_api_response}```"
+                    f"<!here> Delta Exchange Calendar POST API Failed\n```status: {delta_exchange_api_status}\nReason: {delta_exchange_api_response}```"
                 )
             else:
                 published_events.append({**event, "description": "..."})
@@ -135,7 +135,7 @@ class CalendarEventsAggregator:
         if published_events:
             SlackNotifier.send_alert(
                 os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
-                f"Total {len(published_events)} New Events Published\n```{json.dumps(published_events, indent=2)}```"
+                f"<!here> Total {len(published_events)} New Events Published\n```{json.dumps(published_events, indent=2)}```"
             )
 
     @staticmethod
