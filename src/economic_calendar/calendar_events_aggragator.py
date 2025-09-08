@@ -5,10 +5,25 @@ import json
 from .trading_economics import TradingEconomicsCalendarAPI, TradingEconomicsEventWebPageScrapper
 from .delta_exchange import DeltaExchangeCalendarAPI
 from src.vendor import SlackNotifier
+from src.util import logger
 
 MAX_COUNT_TRADING_ECONOMIC_EVENTS_OF_PUSH_NOTIFICATION = 1
 
 class CalendarEventsAggregator:
+
+    @staticmethod
+    def run_india(): 
+        logger.info(f"running calendar events aggregator for India: {os.getnev('TRADING_ENGINE_MASTER_URL')}")
+        CalendarEventsAggregator.execute()
+
+    @staticmethod
+    def run_global(): 
+        TRADING_ENGINE_MASTER_URL = os.getnev("TRADING_ENGINE_MASTER_URL")
+        os.environ['TRADING_ENGINE_MASTER_URL'] = os.getnev("TRADING_ENGINE_GLOBAL_MASTER_URL")
+        logger.info(f"running calendar events aggregator for Global: {os.getnev('TRADING_ENGINE_MASTER_URL')}")
+        CalendarEventsAggregator.execute()
+        os.environ['TRADING_ENGINE_MASTER_URL'] = TRADING_ENGINE_MASTER_URL
+
     @staticmethod
     def execute():
         start_date, end_date = CalendarEventsAggregator.get_time_span()
