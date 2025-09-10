@@ -7,8 +7,6 @@ from .delta_exchange import DeltaExchangeCalendarAPI
 from src.vendor import SlackNotifier
 from src.util import logger
 
-MAX_COUNT_TRADING_ECONOMIC_EVENTS_OF_PUSH_NOTIFICATION = 1
-
 class CalendarEventsAggregator:
 
     @staticmethod
@@ -84,9 +82,7 @@ class CalendarEventsAggregator:
             ]
         ]
 
-        events_to_register_on_delta_exchange = upcoming_trading_economics_events_of_push_notification[:MAX_COUNT_TRADING_ECONOMIC_EVENTS_OF_PUSH_NOTIFICATION]
-
-        CalendarEventsAggregator.register_events_on_delta_exchange(events_to_register_on_delta_exchange)
+        CalendarEventsAggregator.register_events_on_delta_exchange(upcoming_trading_economics_events_of_push_notification)
 
 
     @staticmethod
