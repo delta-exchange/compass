@@ -60,7 +60,10 @@ class AddressUtil:
     def get_city_by_pincode_using_postal_api(pincode):
         try:
             url = f"https://api.postalpincode.in/pincode/{pincode}"
-            response = requests.get(url)
+            response = requests.get(url, headers = {
+                "User-Agent": "curl/7.68.0",  
+                "Accept": "*/*",
+            })
             response_json = response.json()
             
             if not response_json:
