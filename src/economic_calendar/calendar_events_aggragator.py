@@ -131,6 +131,11 @@ class CalendarEventsAggregator:
                 os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
                 f"<!here> Total {len(published_events)} New Events Published\n```{json.dumps(published_events, indent=2)}```"
             )
+        else:
+            SlackNotifier.send_alert(
+                os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
+                f"<!here> No New Events Published"
+            )
 
     @staticmethod
     def get_delta_title(title, ticker):
