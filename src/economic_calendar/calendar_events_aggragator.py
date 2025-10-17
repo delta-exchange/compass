@@ -35,28 +35,18 @@ class CalendarEventsAggregator:
             )
             return
         
-        delta_exchange_api_status, upcoming_delta_exchange_registered_events = DeltaExchangeCalendarAPI.get_delta_calendar_events(start_date, end_date)
-
-        if delta_exchange_api_status != 200:
-            SlackNotifier.send_alert(
-                os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
-                f"<!here> Delta Exchange Calendar GET API Failed\n```status: {delta_exchange_api_status}\nReason: {upcoming_delta_exchange_registered_events}```"
-            )
-            return
-
-        upcoming_delta_exchange_registered_event_urls = {
-            str(event["meta_data"]["source_url"])
-            for event in upcoming_delta_exchange_registered_events
-            if event["meta_data"] and event["meta_data"].get("source_url")
-        }
-
-        upcoming_trading_economics_events_to_register = [
-            event 
-            for event in upcoming_trading_economics_events 
-            if CalendarEventsAggregator.get_trading_economics_event_url(event) not in upcoming_delta_exchange_registered_event_urls
+        upcoming_trading_economics_events = [
+            event
+            for event in upcoming_trading_economics_events
+            if event["Ticker"] in [
+                "FDTR", # FOMC
+                "CPI YOY",
+                "USACIRM",
+                "USAPPIM", # PPI
+            ]
         ]
 
-        upcoming_trading_economics_events_to_register = CalendarEventsAggregator.add_event_descriptions(upcoming_trading_economics_events_to_register) 
+        upcoming_trading_economics_events = CalendarEventsAggregator.add_event_descriptions(upcoming_trading_economics_events)
 
         events_to_register_on_delta_exchange = [{
             "title": CalendarEventsAggregator.get_delta_title(event["Event"], event["Ticker"]),
@@ -69,21 +59,29 @@ class CalendarEventsAggregator:
             "source_url": CalendarEventsAggregator.get_trading_economics_event_url(event),
             "country": event["Country"],
             "timestamp": calendar.timegm(time.strptime(event["Date"], "%Y-%m-%dT%H:%M:%S"))
-        } for event in upcoming_trading_economics_events_to_register]
+        } for event in upcoming_trading_economics_events]
 
-        upcoming_trading_economics_events_of_push_notification = [
-            event
-            for event in events_to_register_on_delta_exchange
-            if event["tags"][0] in [
-                "FDTR", # FOMC
-                "CPI YOY",
-                "USACIRM",
-                "USAPPIM", # PPI
-            ]
-        ]
+        delta_exchange_api_status, upcoming_delta_exchange_registered_events = DeltaExchangeCalendarAPI.get_delta_calendar_events(start_date, end_date)
 
-        CalendarEventsAggregator.register_events_on_delta_exchange(upcoming_trading_economics_events_of_push_notification)
+        if delta_exchange_api_status != 200:
+            SlackNotifier.send_alert(
+                os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
+                f"<!here> Delta Exchange Calendar GET API Failed\n```status: {delta_exchange_api_status}\nReason: {upcoming_delta_exchange_registered_events}```"
+            )
+            return
+        
+        delta_event_identifiers = set([event["title"] + "-" + event["date"] for event in upcoming_delta_exchange_registered_events] + [event["source_url"] for event in upcoming_delta_exchange_registered_events if "source_url" in event])
+        
+        uniq_events_to_register_on_delta_exchange = []
+        for event in events_to_register_on_delta_exchange:
+            if event["title"] + "-" + event["date"] not in delta_event_identifiers and event["source_url"] not in delta_event_identifiers:
+                delta_event_identifiers.add(event["title"] + "-" + event["date"])
+                delta_event_identifiers.add(event["source_url"])
+                uniq_events_to_register_on_delta_exchange.append(event)
+            else:
+                logger.info(f"Event already registered on delta exchange: {event}")
 
+        CalendarEventsAggregator.register_events_on_delta_exchange(uniq_events_to_register_on_delta_exchange)
 
     @staticmethod
     def get_time_span():
@@ -132,6 +130,11 @@ class CalendarEventsAggregator:
             SlackNotifier.send_alert(
                 os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
                 f"<!here> Total {len(published_events)} New Events Published\n```{json.dumps(published_events, indent=2)}```"
+            )
+        else:
+            SlackNotifier.send_alert(
+                os.getenv("SLACK_ECONOMIC_CALENDAR_WEBHOOK_URL"),
+                f"<!here> No New Events Published"
             )
 
     @staticmethod
