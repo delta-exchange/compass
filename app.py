@@ -12,7 +12,7 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(CompassGenerator.start, CronTrigger(hour="0", minute="0"), kwargs={"date": None})
 scheduler.add_job(ReportsCleaner.clean_older_reports, CronTrigger(hour="1", minute="0"))
 scheduler.add_job(CalendarEventsAggregator.run_india, CronTrigger(hour="4", minute="30"))
-scheduler.add_job(CalendarEventsAggregator.run_global, CronTrigger(hour="4", minute="30"))
+scheduler.add_job(CalendarEventsAggregator.run_global, CronTrigger(hour="4", minute="35"))
 
 scheduler.start()
 
