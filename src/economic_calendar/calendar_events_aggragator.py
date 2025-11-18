@@ -6,6 +6,7 @@ from .trading_economics import TradingEconomicsCalendarAPI, TradingEconomicsEven
 from .delta_exchange import DeltaExchangeCalendarAPI
 from src.vendor import SlackNotifier
 from src.util import logger
+from datetime import datetime, timedelta
 
 class CalendarEventsAggregator:
 
@@ -51,7 +52,7 @@ class CalendarEventsAggregator:
 
             events_to_register_on_delta_exchange = [{
                 "title": CalendarEventsAggregator.get_delta_title(event["Event"], event["Ticker"]),
-                "date": event["Date"][:10], # first 10: YYYY-MM-DD 
+                "date": (datetime.strptime(event["Date"], "%Y-%m-%dT%H:%M:%S") + timedelta(hours=5, minutes=30)).strftime("%Y-%m-%dT%H:%M:%S")[:10],
                 "description": event["description"],
                 "category": event["Category"],
                 "tags": [event["Ticker"]],
