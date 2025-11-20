@@ -52,7 +52,7 @@ class CalendarEventsAggregator:
 
             events_to_register_on_delta_exchange = [{
                 "title": CalendarEventsAggregator.get_delta_title(event["Event"], event["Ticker"]),
-                "date": (datetime.strptime(event["Date"], "%Y-%m-%dT%H:%M:%S") + timedelta(hours=5, minutes=30)).strftime("%Y-%m-%dT%H:%M:%S")[:10],
+                "date": (datetime.strptime(event["Date"], "%Y-%m-%dT%H:%M:%S") + timedelta(hours=5, minutes=30)).strftime("%Y-%m-%dT%H:%M:%S") + "Z",
                 "description": event["description"],
                 "category": event["Category"],
                 "tags": [event["Ticker"]],
