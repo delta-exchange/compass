@@ -292,5 +292,11 @@
         "State",
         "Occupation",
         "Income Range"
+    ],
+    "DBS": [
+        "USER_ID",
+        "ASSET_TYPE",
+        "BALANCE",
+        "BALANCE_USD"
     ]
 }

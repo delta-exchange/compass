@@ -3,7 +3,8 @@ import requests
 from decimal import Decimal
 
 from src.database.service import DailyBalanceIstService, ProductService
-from src.util import logger
+from .report_service import ReportService
+from src.util import logger, DateTimeUtil, get_report_index
 
 INR_TO_USD_RATE = Decimal("85")
 USD_ASSET_SYMBOLS = ["USD", "REF_USD", "TFC_USD"]
@@ -12,6 +13,7 @@ class DailyBalanceSnapshotService:
 
     @staticmethod
     def generate_balance_snapshot(from_time, to_time):
+        current_date = DateTimeUtil.get_current_date()
         logger.info("generating daily balance snapshot report")
 
         spot_price_map = DailyBalanceSnapshotService._build_spot_price_map()
@@ -21,8 +23,10 @@ class DailyBalanceSnapshotService:
 
         rows = DailyBalanceSnapshotService._convert_to_report_format(balances, spot_price_map)
 
+        report_name = f"BAL{current_date}" + get_report_index(len(rows), 100000)
+        ReportService.write_report(report_name, rows)
+
         logger.info(f"generated {len(rows)} snapshot rows")
-        return rows
 
     @staticmethod
     def _build_spot_price_map():
