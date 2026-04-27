@@ -7,3 +7,4 @@ from .product_service import ProductService
 from .kyc_details_service import KycDocumentsService
 from .deposit_service import DepositService
 from.withdrawal_service import WithdrawalService
+from .daily_balance_ist_service import DailyBalanceIstService

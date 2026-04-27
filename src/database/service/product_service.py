@@ -20,3 +20,15 @@ class ProductService:
             return products
         finally:
             session.close()
+
+    @staticmethod
+    def get_spot_live_products():
+        session = LedgerEngine.get_session()
+        try:
+            products = session.query(ProductModel).filter(
+                ProductModel.contract_type == 9,
+                ProductModel.state == 1
+            ).all()
+            return products
+        finally:
+            session.close()

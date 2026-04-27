@@ -15,6 +15,7 @@ from .product_details_service import ProductDetailsService
 from .order_transaction_service import OrderTransactionDetailsService
 from .kyc_rejection_details_service import KycRejectionDetailsService
 from .kyc_approved_details_service import KycApprovedDetailsService
+from .daily_balance_snapshot_service import DailyBalanceSnapshotService
 from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 import json
@@ -53,6 +54,8 @@ class CompassGenerator:
             DepositTransactionService.generate_transaction_details(from_date, to_date)
             WithdrawalTransactionService.generate_transaction_details(from_date, to_date)
             FillTransactionDetailsService.generate_transaction_details(from_date, to_date)
+
+            DailyBalanceSnapshotService.generate_balance_snapshot(from_date, to_date)
 
             CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
 
