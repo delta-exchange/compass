@@ -14,6 +14,7 @@ class KycApprovedDetailsService:
             logger.info(f"From: {from_time}")
             report_name = f"KAD{current_date}" + get_report_index(total_count, 100000)
             approvals = KycDocumentsService.get_approved_kycs_between(from_time, to_time, 10000)
+            approvals = KycApprovedDetailsService.get_latest_approvals(approvals)
             approvals_count = len(approvals)
             if approvals_count == 0:
                 break
@@ -34,6 +35,13 @@ class KycApprovedDetailsService:
                 ReportService.write_report(report_name, kyc_approved_compass)
 
         logger.info(f'generated total {total_count} approved kyc details')
+
+    @staticmethod
+    def get_latest_approvals(approvals):
+        user_ids_mapping = {}
+        for approval in approvals:
+            user_ids_mapping[approval.user_id] = approval
+        return list(user_ids_mapping.values())
 
     @staticmethod
     def convert_to_compass_format(approvals, users_mapping, user_kyc_details):
