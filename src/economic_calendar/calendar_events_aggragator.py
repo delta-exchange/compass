@@ -96,7 +96,7 @@ class CalendarEventsAggregator:
         now = time.time()
         start_date = time.strftime("%Y-%m-%d", time.localtime(now))
 
-        after_time_seconds = 30 * 24 * 60 * 60
+        after_time_seconds = 7 * 24 * 60 * 60
         end_date = time.strftime("%Y-%m-%d", time.localtime(now + after_time_seconds))
 
         return start_date, end_date

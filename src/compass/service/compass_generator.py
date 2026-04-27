@@ -14,6 +14,7 @@ from .withdrawal_transaction_service import WithdrawalTransactionService
 from .product_details_service import ProductDetailsService
 from .order_transaction_service import OrderTransactionDetailsService
 from .kyc_rejection_details_service import KycRejectionDetailsService
+from .kyc_approved_details_service import KycApprovedDetailsService
 from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 import json
@@ -43,6 +44,7 @@ class CompassGenerator:
             ExchangeTradesService.generate_trade_volume_details()
 
             KycRejectionDetailsService.generate_rejected_kyc_details(from_date, to_date)
+            KycApprovedDetailsService.generate_approved_kyc_details(from_date, to_date)
 
             LinkedAccountDetailsService.generate_linked_account_details(from_date, to_date)
             CustomerDetailsService.generate_customer_details_details(from_date, to_date)

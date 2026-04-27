@@ -283,5 +283,14 @@
         "Total Rejections",
         "Last Rejection Date",
         "First Rejection Date"
+    ],
+    "KAD": [
+        "User ID",
+        "Name",
+        "KYC Date",
+        "City",
+        "State",
+        "Occupation",
+        "Income Range"
     ]
 }
