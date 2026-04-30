@@ -293,7 +293,7 @@
         "Occupation",
         "Income Range"
     ],
-    "DBS": [
+    "BAL": [
         "USER_ID",
         "ASSET_TYPE",
         "BALANCE",
