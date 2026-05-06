@@ -17,7 +17,7 @@ class DailyBalanceSnapshotService:
         logger.info("generating daily balance snapshot report")
 
         spot_price_map = DailyBalanceSnapshotService._build_spot_price_map()
-        balances = list(DailyBalanceIstService.get_between(from_time, to_time))
+        balances = list(DailyBalanceIstService.get_between(DateTimeUtil.add_days(from_time, -1), to_time))
 
         logger.info(f"fetched {len(balances)} balance records")
 
