@@ -10,3 +10,5 @@ from .compass_generator import CompassGenerator
 from .product_details_service import ProductDetailsService
 from .compass_master_generator import CompassMasterGenerator
 from .reports_cleaner import ReportsCleaner
+from .kyc_approved_details_service import KycApprovedDetailsService
+from .daily_balance_snapshot_service import DailyBalanceSnapshotService

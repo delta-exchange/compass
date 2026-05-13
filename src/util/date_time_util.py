@@ -9,6 +9,12 @@ class DateTimeUtil:
         return last_date
     
     @staticmethod
+    def add_days(date_string, days):
+        date = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S.%fZ')
+        new_date = date + timedelta(days = days)
+        return new_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    
+    @staticmethod
     def get_today_date():
         now = datetime.now(timezone.utc)
         today_date = now.replace(hour=0, minute=0, second=0, microsecond=0).strftime('%Y-%m-%dT%H:%M:%S.%fZ')

@@ -14,6 +14,8 @@ from .withdrawal_transaction_service import WithdrawalTransactionService
 from .product_details_service import ProductDetailsService
 from .order_transaction_service import OrderTransactionDetailsService
 from .kyc_rejection_details_service import KycRejectionDetailsService
+from .kyc_approved_details_service import KycApprovedDetailsService
+from .daily_balance_snapshot_service import DailyBalanceSnapshotService
 from src.vendor import SlackNotifier, SCPTransfer
 import traceback
 import json
@@ -43,6 +45,7 @@ class CompassGenerator:
             ExchangeTradesService.generate_trade_volume_details()
 
             KycRejectionDetailsService.generate_rejected_kyc_details(from_date, to_date)
+            KycApprovedDetailsService.generate_approved_kyc_details(from_date, to_date)
 
             LinkedAccountDetailsService.generate_linked_account_details(from_date, to_date)
             CustomerDetailsService.generate_customer_details_details(from_date, to_date)
@@ -51,6 +54,8 @@ class CompassGenerator:
             DepositTransactionService.generate_transaction_details(from_date, to_date)
             WithdrawalTransactionService.generate_transaction_details(from_date, to_date)
             FillTransactionDetailsService.generate_transaction_details(from_date, to_date)
+
+            DailyBalanceSnapshotService.generate_balance_snapshot(from_date, to_date)
 
             CustomerLastTransactionDetailsService.generate_last_transaction_details(from_date, to_date)
 
@@ -85,7 +90,7 @@ class CompassGenerator:
             report_path = os.path.join(reports_directory, f'{service}{DateTimeUtil.get_current_date()}01.csv')
             if not os.path.exists(report_path):
                 file = open(report_path, 'w')
-                file.write(','.join(attributes[service]))
+                file.write('|'.join(attributes[service]) + '\n')
                 file.close()
         eod_file_path = os.path.join(reports_directory, f"EOD{DateTimeUtil.get_current_date()}.csv")
         if not os.path.exists(eod_file_path):

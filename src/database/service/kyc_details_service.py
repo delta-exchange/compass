@@ -42,6 +42,15 @@ class KycDocumentsService:
             session.close()
     
     @staticmethod
+    def get_approved_kycs_between(since, to, batch_size=10000):
+        session = IamEngine.get_session()
+        try:
+            kycs = session.query(KycStatusLogModel).filter(KycStatusLogModel.status == "approved", KycStatusLogModel.kyc_verification_type == "address_verification", KycStatusLogModel.updated_at > since, KycStatusLogModel.updated_at <= to).limit(batch_size).all()
+            return kycs
+        finally:
+            session.close()
+    
+    @staticmethod
     def get_rejection_stats_by_user_before(user_ids, date):
         session = IamEngine.get_session()
         try:

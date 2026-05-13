@@ -283,5 +283,20 @@
         "Total Rejections",
         "Last Rejection Date",
         "First Rejection Date"
+    ],
+    "KAD": [
+        "User ID",
+        "Name",
+        "KYC Date",
+        "City",
+        "State",
+        "Occupation",
+        "Income Range"
+    ],
+    "BAL": [
+        "USER_ID",
+        "ASSET_TYPE",
+        "BALANCE",
+        "BALANCE_USD"
     ]
 }
