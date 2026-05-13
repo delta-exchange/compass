@@ -23,7 +23,7 @@ class DailyBalanceSnapshotService:
 
         rows = DailyBalanceSnapshotService._convert_to_report_format(balances, spot_price_map)
 
-        report_name = f"BAL{current_date}" + get_report_index(len(rows), 100000)
+        report_name = f"BAL{current_date}" + get_report_index(len(rows), 10000000)
         ReportService.write_report(report_name, rows)
 
         logger.info(f"generated {len(rows)} snapshot rows")
