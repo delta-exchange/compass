@@ -285,13 +285,13 @@
         "First Rejection Date"
     ],
     "KAD": [
-        "User ID",
+        "User_ID",
         "Name",
-        "KYC Date",
+        "KYC_Date",
         "City",
         "State",
         "Occupation",
-        "Income Range"
+        "Income_Range"
     ],
     "BAL": [
         "USER_ID",

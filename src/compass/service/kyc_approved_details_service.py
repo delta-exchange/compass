@@ -61,12 +61,12 @@ class KycApprovedDetailsService:
                 name = user.first_name
 
             compass_list.append({
-                "User ID": approval.user_id,
+                "User_ID": approval.user_id,
                 "Name": name,
-                "KYC Date": approval.updated_at,
+                "KYC_Date": approval.updated_at,
                 "City": city,
                 "State": state,
                 "Occupation": user.occupation if user else None,
-                "Income Range": user.income if user else None,
+                "Income_Range": user.income if user else None,
             })
         return compass_list
